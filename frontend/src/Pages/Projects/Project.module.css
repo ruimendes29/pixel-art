@@ -1,0 +1,21 @@
+.project {
+    width: 100%;
+    justify-self: center;
+    text-align: center;
+    background-color: white;
+    margin:1rem 0;
+  }
+  
+  .project:hover {
+    filter: brightness(90%);
+    cursor: pointer;
+  }
+  
+  .project > p {
+    font-size: 1.5rem;
+    color: var(--primary-color, black);
+  }
+  
+  .project > img {
+    width: 100%;
+  }

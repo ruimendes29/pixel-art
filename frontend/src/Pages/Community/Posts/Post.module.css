@@ -1,0 +1,85 @@
+.post-holder{
+    justify-self: center;
+    text-align: center;
+    color: var(--primary-color,black);
+    font-size: 1.5rem;
+    font-weight: 400;
+    background-color: white;
+}
+
+.post-holder:hover{
+    filter: brightness(90%);
+    cursor: pointer;
+}
+
+.img{
+    width: 100%;
+    aspect-ratio: 1/1;
+}
+
+.modal{
+    color: var(--primary-color,black);
+    width: 70vw;
+    display: grid;
+    text-align: center;
+    grid-template-columns: 70% 30%;
+}
+
+.modal-img{
+    width: min(90%,85vh);
+    align-self: center;
+}
+.left{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.right{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.author{
+    width: 100%;
+    overflow: hidden;
+    border-radius: 50%;
+    aspect-ratio: 1/1;
+}
+
+.author-img>img{
+    width: 100%;
+}
+
+.author-name{
+    font-weight: 600;
+    white-space: nowrap;
+    font-size: 1.3rem;
+}
+
+.description{
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+.not-clickable:hover{
+    cursor: not-allowed;
+    filter: brightness(90%);
+}
+
+.guest-like{
+    font-size: 1.3rem;
+    text-align: center;
+    align-self: center;
+}
+
+@media only screen and (max-width: 40em) {
+    .modal {
+      grid-template-columns: 1fr;
+    }
+    .author{
+        margin: 0 auto;
+        width: 50%;
+    }
+  }

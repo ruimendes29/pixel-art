@@ -1,0 +1,14 @@
+.posts-holder{
+    margin: 2rem 0;
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(4,1fr);
+    gap:1rem;
+}
+
+@media screen and (max-width:40em) {
+    .posts-holder{
+        grid-template-columns: repeat(2,1fr);
+    }
+    
+}

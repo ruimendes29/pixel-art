@@ -1,0 +1,52 @@
+.home {
+  margin: 0 auto;
+  width: 90vw;
+  height: 60vh;
+  position: relative;
+  margin-top: 10vh;
+}
+
+.btn{
+  width: 100%;
+  font-size: 1.8rem;
+  max-width: 500px;
+}
+
+.btns {
+  width: 100%;
+  display: flex;
+  margin-top: 5rem;
+  flex-direction: column;
+}
+
+.btns > * {
+  margin: 0.7rem 0;
+}
+
+.info-text {
+  width: 100%;
+  font-size: 3rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+.info-text::before {
+  position: absolute;
+  top: -0.2rem;
+  left: 0.2rem;
+  display: block;
+  content: "";
+  width: 20%;
+  height: 0.5rem;
+  background-color: var(--primary-color);
+}
+
+
+@media screen and (min-width:40em) {
+  .info-text{
+    
+  }
+  
+}

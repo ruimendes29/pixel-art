@@ -1,0 +1,10 @@
+* > {
+  box-sizing: border-box;
+}
+
+.not-logged {
+  margin-top: 2rem;
+  font-size: 2rem;
+  color: var(--primary-color, black);
+  text-align: center;
+}

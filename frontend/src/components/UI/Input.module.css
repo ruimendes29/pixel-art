@@ -1,0 +1,49 @@
+.input {
+  display: flex;
+  flex-direction: column;
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--primary-color);
+  justify-content: space-between;
+}
+
+.input > input {
+  margin-left: 0.2rem;
+  margin-top: 1rem;
+  border: none;
+  font-size: 1.5rem;
+  width: 100%;
+  letter-spacing: 0.05rem;
+  font-weight: 500;
+  border-bottom: 0.2rem solid var(--primary-color);
+  background-color: transparent;
+  position: relative;
+  height: auto;
+}
+
+.input > input:focus {
+  outline: none;
+  padding: 0;
+}
+
+.invalid > input {
+  color: red;
+  border-bottom: 0.2rem solid var(--error-color);
+}
+
+.invalid{
+    position: relative;
+}
+
+.invalid>.invalid-text{
+    display: block;
+    position: absolute;
+    font-size: 0.8rem;
+    top: 2.3rem;
+    left: 0.2rem;
+    color: var(--error-color);
+}
+
+.invalid-text{
+    display: none;
+}

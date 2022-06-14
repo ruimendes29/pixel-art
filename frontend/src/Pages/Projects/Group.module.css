@@ -1,0 +1,28 @@
+.group{
+    width: 100%;
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    aspect-ratio: 1/1;
+    background-color: white;
+    margin:1rem 0;
+    position: relative;
+}
+
+.folder{
+    font-size: 15vw
+}
+
+.group:hover{
+    filter: brightness(90%);
+}
+
+.name{
+    position: absolute;
+    bottom: 1rem;
+    font-size: 1.5rem;
+    color: var(--primary-color, black);
+}

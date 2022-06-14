@@ -1,0 +1,13 @@
+.buttons {
+  grid-column-start: 3;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.btn {
+    padding: 0.3rem 5vw!important;
+  width: 100%;
+  min-width: fit-content;
+  max-width: 150px;
+}

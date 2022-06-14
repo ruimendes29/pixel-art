@@ -1,0 +1,31 @@
+.backdrop {
+  background-color: rgba(117, 117, 117, 0.444);
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  min-height: fit-content;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background-color: white;
+  padding: 3rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px 2px rgb(107, 107, 107);
+}
+
+@media only screen and (max-width: 40em) {
+  .backdrop{
+    height: fit-content;
+    align-items: flex-start;
+  }
+  .modal{
+    margin: 1rem 0;
+  }
+  
+}

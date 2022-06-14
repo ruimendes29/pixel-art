@@ -1,0 +1,35 @@
+.community {
+  width: 90vw;
+  margin: 0 auto;
+  margin-top: 5vh;
+}
+
+.search-header{
+  font-size: 1.5rem;
+  width: 100%;
+  display: grid;
+  justify-content: space-between;
+  grid-template-columns: 33% 53% 13%;
+}
+
+.categories{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap:0 1rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.invalid{
+  cursor: default;
+  background-color: transparent;
+  color: grey;
+}
+
+.no-tags{
+  width: 50%;
+  justify-self: center;
+  font-size: 1.5rem;
+  padding: 0.83rem;
+}

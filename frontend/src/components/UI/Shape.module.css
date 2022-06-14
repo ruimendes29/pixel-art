@@ -1,0 +1,20 @@
+.square {
+  display: block;
+  width: 30vh;
+  aspect-ratio: 1/1;
+  background-color: var(--primary-color);
+  opacity: 15%;
+  border-radius: 4vh;
+}
+
+.shape {
+  position: absolute;
+  z-index: -99999;
+  display: grid;
+  right: -20vh;
+  top: var(--nav-height);
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  transform: rotate(45deg);
+  width: fit-content;
+}

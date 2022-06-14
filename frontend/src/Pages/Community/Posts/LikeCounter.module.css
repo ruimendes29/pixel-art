@@ -1,0 +1,25 @@
+.counter{
+    color: var(--primary-color,black);
+    font-size: 1.5rem;
+    background-color: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 1rem auto;
+    width: 30%;
+    border-radius: 0.5rem;
+    box-shadow: 0 3px 10px 1px rgb(205, 205, 205);
+}
+
+.not-clickable:hover{
+    cursor: not-allowed;
+    filter: none;
+
+}
+
+@media screen and (max-width:40em) {
+    .counter{
+        width: 80%;
+    }
+    
+}

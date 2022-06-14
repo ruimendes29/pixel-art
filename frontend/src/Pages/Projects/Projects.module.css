@@ -1,0 +1,50 @@
+.projects {
+  width: 90vw;
+  margin: 0 auto;
+  margin-top: 5vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.btn {
+  margin: 0 auto;
+  width: fit-content;
+  padding: 0.5rem 3rem;
+  margin-bottom: 1rem;
+}
+
+.icon {
+  margin-left: 1rem;
+}
+
+.projects-holder {
+  display: grid;
+  width: 100%;
+  gap: 1rem;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.no-project{
+  grid-column: 1/5;
+  margin: 0 auto;
+  margin-top: 2rem;
+  font-size: 2rem;
+  color: var(--primary-color);
+  text-align: center;
+}
+
+.buttons{
+  display: flex;
+  gap:1rem;
+}
+
+.group-button{
+  margin-top: 1rem;
+}
+
+@media screen and (max-width: 40em) {
+  .projects-holder {
+    grid-template-columns:1fr 1fr;
+  }
+}

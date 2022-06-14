@@ -1,0 +1,16 @@
+.funct{
+    height: 85vmin;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    
+}
+
+.buttons{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}

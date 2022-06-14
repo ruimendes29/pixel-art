@@ -1,0 +1,24 @@
+.line {
+  width: var(--slider-width,18rem);
+  height: 0.5rem;
+  position: relative;
+  background-color: var(--secondary-color);
+}
+
+.ball {
+  position: absolute;
+  width: 1.3rem;
+  aspect-ratio: 1/1;
+  background-color: var(--primary-color, blue);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.slider {
+  margin: 0 auto;
+}
+
+.slider.vertical {
+  transform: rotate(90deg);
+}

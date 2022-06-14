@@ -1,0 +1,28 @@
+.canvas-holder{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  justify-content: center;
+}
+
+
+.canvas {
+  border: 1px solid black;
+}
+
+.name{
+  text-align: left;
+  font-size: 1.3rem;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.space-pressed:hover {
+  cursor: grab;
+}
+
+.panning:hover {
+  cursor: grabbing;
+}

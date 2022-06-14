@@ -1,0 +1,37 @@
+.change-mouse-holder{
+    color: var(--primary-color);
+    position: relative;
+    width: min(100%,400px);
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.size{
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+}
+
+.slider{
+    position: absolute;
+    top: 15rem;
+}
+
+.selected{
+    -webkit-box-shadow:inset 0px 0px 0px 2px var(--primary-color)!important;
+    -moz-box-shadow:inset 0px 0px 0px 2px var(--primary-color)!important;
+    box-shadow:inset 0px 0px 0px 2px var(--primary-color)!important;
+}
+
+.option{
+    min-width: calc(var(--container-height) - 1rem);
+    min-height: calc(var(--container-height) - 1rem);
+    border-radius: 50%;
+    font-size: xx-large;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0px 4px 5px 2px rgba(0, 0, 0, 0.25);
+}
