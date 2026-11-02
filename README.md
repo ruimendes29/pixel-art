@@ -49,3 +49,15 @@ npm start
 ```
 
 The frontend calls `http://localhost:8080/api` by default. To point it at a deployed backend, set `REACT_APP_API_URL` (for example in `frontend/.env`) before `npm start` or `npm run build`.
+
+## Deploying
+
+1. **Database:** any MySQL 8 server. Load `backend/schema.sql` once.
+2. **Backend:** run it on a host that keeps files on disk between restarts (uploaded images are saved to `backend/uploads/`), with the `.env` variables set. Serve it over **HTTPS**: browsers block an HTTPS page from calling an HTTP API.
+3. **Frontend:** build with the backend's address, then deploy the `build/` folder:
+
+   ```bash
+   cd frontend
+   REACT_APP_API_URL=https://your-backend.example.com/api npm run build
+   gcloud app deploy app.yaml
+   ```

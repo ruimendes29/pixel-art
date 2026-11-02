@@ -10,7 +10,12 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     const user = jwt.verify(req.headers.authorization, process.env.TOKEN_KEY);
     console.log(user);
-    cb(null, user.username + "_" + file.originalname + "_" + user.id + ".png");
+    // strip anything that could escape the uploads folder (e.g. "../")
+    const safeName = (user.username + "_" + file.originalname).replace(
+      /[^\w.-]/g,
+      "_"
+    );
+    cb(null, safeName + "_" + user.id + ".png");
   },
 });
 

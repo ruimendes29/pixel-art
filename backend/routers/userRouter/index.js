@@ -8,7 +8,8 @@ const storage = multer.diskStorage({
     cb(null, "./uploads/users/");
   },
   filename: function (req, file, cb) {
-    cb(null, new Date().toISOString() + file.originalname);
+    // strip anything that could escape the uploads folder (e.g. "../")
+    cb(null, Date.now() + "_" + file.originalname.replace(/[^\w.-]/g, "_"));
   },
 });
 

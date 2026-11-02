@@ -4,8 +4,8 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const checkUser = async (name, email) => {
-  const sqlQuery = `SELECT username,email FROM User WHERE username='${name}' and email='${email}';`;
-  const ret = await sqlController.queryDataBase(sqlQuery);
+  const sqlQuery = `SELECT id,username,email,password FROM User WHERE username=? and email=?;`;
+  const ret = await sqlController.queryDataBase(sqlQuery, [name, email]);
   return ret;
 };
 
@@ -31,8 +31,10 @@ const getUserName = async (token) => {
 };
 
 const loginUser = async (username, password) => {
-  const checkUserExists = `SELECT password,id FROM User WHERE username='${username}' limit 1`;
-  const userInfo = await sqlController.queryDataBase(checkUserExists);
+  const checkUserExists = `SELECT password,id FROM User WHERE username=? limit 1`;
+  const userInfo = await sqlController.queryDataBase(checkUserExists, [
+    username,
+  ]);
   if (userInfo.length === 0) {
     throw Error("Username does not exist!");
   }
@@ -47,8 +49,10 @@ const loginUser = async (username, password) => {
 };
 
 const isEmailUsed = async (email) => {
-  const checkIfEmailExists = `SELECT * FROM User WHERE email='${email}'`;
-  const returnedRows = await sqlController.queryDataBase(checkIfEmailExists);
+  const checkIfEmailExists = `SELECT * FROM User WHERE email=?`;
+  const returnedRows = await sqlController.queryDataBase(checkIfEmailExists, [
+    email,
+  ]);
 
   return returnedRows.length > 0;
 };
@@ -63,11 +67,16 @@ const addUser = async (name, email, password, photo) => {
   const emailUsed = await isEmailUsed(email);
   if (checkName && checkEmail && !emailUsed) {
     // firstly insert photo path in database to get id
-    const addImage = `INSERT INTO Image (path) VALUES ('${photo}')`;
-    const image = await sqlController.queryDataBase(addImage);
+    const addImage = `INSERT INTO Image (path) VALUES (?)`;
+    const image = await sqlController.queryDataBase(addImage, [photo]);
     // insert the user in the DB using the photo id
-    const sqlQuery = `INSERT INTO User (username,email,password,photo) VALUES ('${name}','${email}','${hashedPassword}',${image.insertId});`;
-    const ret = await sqlController.queryDataBase(sqlQuery);
+    const sqlQuery = `INSERT INTO User (username,email,password,photo) VALUES (?,?,?,?);`;
+    const ret = await sqlController.queryDataBase(sqlQuery, [
+      name,
+      email,
+      hashedPassword,
+      image.insertId,
+    ]);
     return ret;
   } else if (emailUsed) {
     throw new Error("Email is already in use!");
@@ -78,21 +87,25 @@ const addUser = async (name, email, password, photo) => {
 
 const removeUser = async (name, email, password) => {
   const userExists = await checkUser(name, email);
-  if (userExists.length > 0) {
-    const sqlQuery = `DELETE FROM User WHERE username='${name}' and email='${email}';`;
-    const ret = await sqlController.queryDataBase(sqlQuery);
-    return ret;
+  if (userExists.length === 0) {
+    throw new Error("User does not exist!");
   }
+  if (!bcrypt.compareSync(password, userExists[0].password)) {
+    throw new Error("Credentials do not match!");
+  }
+  const sqlQuery = `DELETE FROM User WHERE id=?;`;
+  const ret = await sqlController.queryDataBase(sqlQuery, [userExists[0].id]);
+  return ret;
 };
 
 const getPhoto = async (id) => {
   try {
-    const photoIdQuery = `SELECT photo FROM User WHERE id=${id}`;
-    const photoIdRow = await sqlController.queryDataBase(photoIdQuery);
+    const photoIdQuery = `SELECT photo FROM User WHERE id=?`;
+    const photoIdRow = await sqlController.queryDataBase(photoIdQuery, [id]);
     const photoId = photoIdRow[0].photo;
 
-    const pathQuery = `SELECT path FROM Image WHERE id=${photoId}`;
-    const pathRow = await sqlController.queryDataBase(pathQuery);
+    const pathQuery = `SELECT path FROM Image WHERE id=?`;
+    const pathRow = await sqlController.queryDataBase(pathQuery, [photoId]);
 
     return pathRow[0].path;
   } catch (err) {
@@ -104,8 +117,8 @@ const getGroups = async (token) => {
   try {
     // get information from the user using the jwt
     const user = jwt.verify(token, process.env.TOKEN_KEY);
-    const groupQuery = `SELECT name,id FROM Grupo WHERE owner=${user.id}`;
-    const groupRows = await sqlController.queryDataBase(groupQuery);
+    const groupQuery = `SELECT name,id FROM Grupo WHERE owner=?`;
+    const groupRows = await sqlController.queryDataBase(groupQuery, [user.id]);
     return groupRows.map((el) => {
       return { name: el.name, id: el.id };
     });
@@ -118,16 +131,19 @@ const addGroup = async (token, groupName) => {
   try {
     // get information from the user using the jwt
     const user = jwt.verify(token, process.env.TOKEN_KEY);
-    const groupQuery = `INSERT INTO Grupo (owner,name) VALUES ('${user.id}','${groupName}');`;
-    const insertedGroup = await sqlController.queryDataBase(groupQuery);
+    const groupQuery = `INSERT INTO Grupo (owner,name) VALUES (?,?);`;
+    const insertedGroup = await sqlController.queryDataBase(groupQuery, [
+      user.id,
+      groupName,
+    ]);
   } catch (err) {
     throw new Error("Invalid Token");
   }
 };
 
 const getName = async (id) => {
-  const sql = `SELECT username FROM User WHERE id=${id}`;
-  const fromDB = await sqlController.queryDataBase(sql);
+  const sql = `SELECT username FROM User WHERE id=?`;
+  const fromDB = await sqlController.queryDataBase(sql, [id]);
   return fromDB[0].username;
 };
 

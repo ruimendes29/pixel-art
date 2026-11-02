@@ -16,7 +16,8 @@ const Project = (props: { id: number; name: string; onClick:Function }) => {
         headers: { "Content-Type": "image/*" },
         responseType: "blob",
       });
-      setImage(URL.createObjectURL(file));
+      // no file when the project hasn't been saved yet: keep the placeholder
+      if (file) setImage(URL.createObjectURL(file));
     };
     fetchImage();
   }, [sendHttpReq, props.id]);

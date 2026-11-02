@@ -32,7 +32,7 @@ const Post = (props: {
         headers: { "Content-Type": "image/*" },
         responseType: "blob",
       });
-      setPostImage(URL.createObjectURL(file));
+      if (file) setPostImage(URL.createObjectURL(file));
     };
     const fetchUserInfo = async () => {
       const photoFromDB = await sendHttpRequest({
@@ -45,7 +45,10 @@ const Post = (props: {
         url: `${COMMON_URL}/users/name/${props.authorId}`,
         headers: { "Content-Type": "application/json" },
       });
-      setUserInfo({ image: URL.createObjectURL(photoFromDB), name: username });
+      setUserInfo({
+        image: photoFromDB ? URL.createObjectURL(photoFromDB) : "",
+        name: username,
+      });
     };
     const fetchLikeInfo = async () => {
       const { likes } = await sendHttpRequest({

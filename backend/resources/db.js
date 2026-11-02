@@ -1,8 +1,10 @@
 const { connection } = require("../global");
 
-module.exports.queryDataBase = async (sql) => {
+// Always pass user input through `params` (the ? placeholders in `sql`),
+// never by building the SQL string, so it can't be used for SQL injection.
+module.exports.queryDataBase = async (sql, params = []) => {
   return new Promise((resolve, reject) => {
-    connection.query(sql, (err, result) => {
+    connection.query(sql, params, (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });
