@@ -1,8 +1,8 @@
 const sqlController = require("../../resources/db");
-const jwt = require("jsonwebtoken");
+const auth = require("../../resources/auth");
 
 const getGroups = async (token) => {
-  const user = jwt.verify(token, process.env.TOKEN_KEY);
+  const user = await auth.verify(token);
   const sql = `SELECT * FROM Grupo WHERE owner=?`;
   const grupos = await sqlController.queryDataBase(sql, [user.id]);
   return grupos;

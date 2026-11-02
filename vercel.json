@@ -1,0 +1,9 @@
+{
+  "installCommand": "npm --prefix backend install && npm --prefix frontend install",
+  "buildCommand": "cd frontend && CI=false REACT_APP_API_URL=/api npm run build",
+  "outputDirectory": "frontend/build",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}

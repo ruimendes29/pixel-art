@@ -1,26 +1,10 @@
 const express = require("express");
 const multer = require("multer");
-const fs = require("fs");
-const jwt = require("jsonwebtoken");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./uploads/arts/");
-  },
-  filename: function (req, file, cb) {
-    const user = jwt.verify(req.headers.authorization, process.env.TOKEN_KEY);
-    console.log(user);
-    // strip anything that could escape the uploads folder (e.g. "../")
-    const safeName = (user.username + "_" + file.originalname).replace(
-      /[^\w.-]/g,
-      "_"
-    );
-    cb(null, safeName + "_" + user.id + ".png");
-  },
-});
-
+// canvas images are kept in memory and saved in the database
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 1024 * 1024 * 4 },
 });
 
 const router = express.Router();
@@ -77,9 +61,10 @@ router.post("/add-image", upload.single("image"), async (req, res) => {
   try {
     const { projectId } = req.body;
 
+    if (!req.file) throw new Error("No image was sent!");
     await controller.addImageToProject(
       req.headers.authorization,
-      req.file.path,
+      req.file,
       projectId
     );
     res.status(200).jsonp({});
@@ -107,8 +92,8 @@ router.get("/project-owner/:id", async (req, res) => {
 router.get("/project-image/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const path = await controller.getImage(id);
-    res.sendFile(`${path}`, { root: "." });
+    const image = await controller.getImage(id);
+    res.type(image.mime).send(image.data);
   } catch (error) {
     console.error(error);
     res.status(401).jsonp({ error: error.message });

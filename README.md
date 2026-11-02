@@ -15,15 +15,16 @@ A free web app for creating pixel art in the browser: draw on a grid, save your 
 | Layer | Tech |
 | --- | --- |
 | Frontend | React 18, TypeScript, Redux Toolkit, React Router, React Bootstrap |
-| Backend | Node.js, Express, JWT, Multer |
+| Backend | Node.js, Express, JWT (jose), Multer |
 | Database | MySQL |
-| Deploy | Google App Engine (frontend) |
+| Deploy | Vercel (static frontend + serverless API), Aiven MySQL |
 
 ## Project structure
 
 ```
 frontend/   React + TypeScript single-page app
 backend/    Express REST API (controllers/, routers/, resources/)
+api/        Vercel serverless entry point that runs the backend
 ```
 
 ## Running locally
@@ -38,7 +39,7 @@ npm install
 npm start
 ```
 
-The API listens on port 8080 (override with `PORT`). Uploaded images are stored in `backend/uploads/`.
+The API listens on port 8080 (override with `PORT`). Uploaded images (profile photos and saved canvases) are stored in the database.
 
 **Frontend**
 
@@ -52,12 +53,7 @@ The frontend calls `http://localhost:8080/api` by default. To point it at a depl
 
 ## Deploying
 
-1. **Database:** any MySQL 8 server. Load `backend/schema.sql` once. The project currently uses Aiven's free MySQL plan (console.aiven.io): put the host, port, user, password and database from the service's *Connection information* in `backend/.env`, download its *CA certificate* to `backend/ca.pem` and set `DB_SSL_CA=./ca.pem`. Free Aiven services power off after a period of inactivity; power them back on from the console.
-2. **Backend:** run it on a host that keeps files on disk between restarts (uploaded images are saved to `backend/uploads/`), with the `.env` variables set. Serve it over **HTTPS**: browsers block an HTTPS page from calling an HTTP API.
-3. **Frontend:** build with the backend's address, then deploy the `build/` folder:
+The app is deployed on **Vercel** as a single project: `vercel.json` builds the frontend and serves the backend as a serverless function under `/api`, so both share one address and the frontend calls `/api`.
 
-   ```bash
-   cd frontend
-   REACT_APP_API_URL=https://your-backend.example.com/api npm run build
-   gcloud app deploy app.yaml
-   ```
+1. **Database:** any MySQL 8 server; load `backend/schema.sql` once. The live version uses Aiven's free MySQL plan (console.aiven.io). Free Aiven services power off after a period of inactivity; power them back on from the console.
+2. **Vercel:** import this repository as a new project (no other settings needed) and add these environment variables from the database's connection information: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSL_CA` (the CA certificate, with line breaks written as `\n`) and `TOKEN_KEY` (any long random string).

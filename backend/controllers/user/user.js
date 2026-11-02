@@ -1,6 +1,6 @@
 const sqlController = require("../../resources/db");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const auth = require("../../resources/auth");
 require("dotenv").config();
 
 const checkUser = async (name, email) => {
@@ -12,7 +12,7 @@ const checkUser = async (name, email) => {
 const getUserId = async (token) => {
   try {
     // get information from the user using the jwt
-    const user = jwt.verify(token, process.env.TOKEN_KEY);
+    const user = await auth.verify(token);
     console.log(user.id);
     return user.id;
   } catch (err) {
@@ -23,7 +23,7 @@ const getUserId = async (token) => {
 const getUserName = async (token) => {
   try {
     // get information from the user using the jwt
-    const user = jwt.verify(token, process.env.TOKEN_KEY);
+    const user = await auth.verify(token);
     return user.username;
   } catch (err) {
     throw new Error("Invalid Token");
@@ -44,7 +44,7 @@ const loginUser = async (username, password) => {
     throw Error("Credentials do not match!");
   }
   return {
-    token: jwt.sign({ username, id: userInfo[0].id }, process.env.TOKEN_KEY),
+    token: await auth.sign({ username, id: userInfo[0].id }),
   };
 };
 
@@ -66,9 +66,12 @@ const addUser = async (name, email, password, photo) => {
   // check if the email is already in use
   const emailUsed = await isEmailUsed(email);
   if (checkName && checkEmail && !emailUsed) {
-    // firstly insert photo path in database to get id
-    const addImage = `INSERT INTO Image (path) VALUES (?)`;
-    const image = await sqlController.queryDataBase(addImage, [photo]);
+    // firstly store the photo in the database to get its id
+    const addImage = `INSERT INTO Image (data,mime) VALUES (?,?)`;
+    const image = await sqlController.queryDataBase(addImage, [
+      photo.buffer,
+      photo.mimetype,
+    ]);
     // insert the user in the DB using the photo id
     const sqlQuery = `INSERT INTO User (username,email,password,photo) VALUES (?,?,?,?);`;
     const ret = await sqlController.queryDataBase(sqlQuery, [
@@ -104,10 +107,10 @@ const getPhoto = async (id) => {
     const photoIdRow = await sqlController.queryDataBase(photoIdQuery, [id]);
     const photoId = photoIdRow[0].photo;
 
-    const pathQuery = `SELECT path FROM Image WHERE id=?`;
-    const pathRow = await sqlController.queryDataBase(pathQuery, [photoId]);
+    const imageQuery = `SELECT data,mime FROM Image WHERE id=?`;
+    const imageRow = await sqlController.queryDataBase(imageQuery, [photoId]);
 
-    return pathRow[0].path;
+    return imageRow[0];
   } catch (err) {
     throw new Error("Invalid Token");
   }
@@ -116,7 +119,7 @@ const getPhoto = async (id) => {
 const getGroups = async (token) => {
   try {
     // get information from the user using the jwt
-    const user = jwt.verify(token, process.env.TOKEN_KEY);
+    const user = await auth.verify(token);
     const groupQuery = `SELECT name,id FROM Grupo WHERE owner=?`;
     const groupRows = await sqlController.queryDataBase(groupQuery, [user.id]);
     return groupRows.map((el) => {
@@ -130,7 +133,7 @@ const getGroups = async (token) => {
 const addGroup = async (token, groupName) => {
   try {
     // get information from the user using the jwt
-    const user = jwt.verify(token, process.env.TOKEN_KEY);
+    const user = await auth.verify(token);
     const groupQuery = `INSERT INTO Grupo (owner,name) VALUES (?,?);`;
     const insertedGroup = await sqlController.queryDataBase(groupQuery, [
       user.id,

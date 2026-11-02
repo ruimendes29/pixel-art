@@ -1,27 +1,18 @@
 const express = require("express");
 const multer = require("multer");
-const fs = require("fs");
-const jwt = require("jsonwebtoken");
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./uploads/users/");
-  },
-  filename: function (req, file, cb) {
-    // strip anything that could escape the uploads folder (e.g. "../")
-    cb(null, Date.now() + "_" + file.originalname.replace(/[^\w.-]/g, "_"));
-  },
-});
+const auth = require("../../resources/auth");
 
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.split("/")[0] === "image") cb(null, true);
   else cb(null, false);
 };
 
+// images are kept in memory and saved in the database (no local disk needed);
+// 4 MB keeps requests under the serverless body limit
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   fileFilter,
-  limits: { fileSize: 1024 * 1024 * 5 },
+  limits: { fileSize: 1024 * 1024 * 4 },
 });
 
 const router = express.Router();
@@ -32,11 +23,11 @@ const controller = require("../../controllers/user/user");
 router.get("/photo", async (req, res) => {
   try {
     token = req.query.key;
-    const photoPath = await controller.getPhoto(
-      jwt.verify(token, process.env.TOKEN_KEY).id
+    const photo = await controller.getPhoto(
+      (await auth.verify(token)).id
     );
 
-    res.sendFile(`${photoPath}`, { root: "." });
+    res.type(photo.mime).send(photo.data);
   } catch (error) {
     console.error(error);
     res.status(401).jsonp({ error: error.message });
@@ -46,9 +37,9 @@ router.get("/photo", async (req, res) => {
 router.get("/photo/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const photoPath = await controller.getPhoto(id);
+    const photo = await controller.getPhoto(id);
 
-    res.sendFile(`${photoPath}`, { root: "." });
+    res.type(photo.mime).send(photo.data);
   } catch (error) {
     console.error(error);
     res.status(401).jsonp({ error: error.message });
@@ -109,10 +100,9 @@ router.post("/add-user", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) throw new Error("A profile picture is required!");
     const { name, email, password } = req.body;
-    await controller.addUser(name, email, password, req.file.path);
+    await controller.addUser(name, email, password, req.file);
     res.status(200).send({});
   } catch (error) {
-    if (req.file) fs.unlinkSync(req.file.path);
     console.error(error);
     res.status(401).jsonp({ error: error.message });
   }

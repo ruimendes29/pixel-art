@@ -1,5 +1,5 @@
 const sqlController = require("../../resources/db");
-const jwt = require("jsonwebtoken");
+const auth = require("../../resources/auth");
 require("dotenv").config();
 
 const createProject = async (
@@ -10,7 +10,7 @@ const createProject = async (
   projectGroup
 ) => {
   //token, author, name, description, group
-  const user = jwt.verify(token, process.env.TOKEN_KEY);
+  const user = await auth.verify(token);
   if (projectGroup) {
     console.log(projectGroup);
     const checkGroup = `SELECT * FROM Grupo WHERE owner=? and id=?`;
@@ -40,33 +40,38 @@ const getAuthor = async (id) => {
 };
 
 const addImageToProject = async (token, image, projectId) => {
-  const checkUser = `Select author from Project where id=?`;
-  const owner = (await sqlController.queryDataBase(checkUser, [projectId]))[0]
-    .author;
-  const user = jwt.verify(token, process.env.TOKEN_KEY);
-  if (owner !== user.id) {
+  const checkUser = `Select author,image from Project where id=?`;
+  const project = (await sqlController.queryDataBase(checkUser, [projectId]))[0];
+  const user = await auth.verify(token);
+  if (project.author !== user.id) {
     throw new Error("Token does not match owner of the project");
   }
-  const checkIfImageExists = `SELECT * FROM Image WHERE path=?`;
-  const fromDB = await sqlController.queryDataBase(checkIfImageExists, [image]);
-  if (fromDB.length === 0) {
-    const addImage = `INSERT INTO Image (path) VALUES (?)`;
-    const insertedImage = await sqlController.queryDataBase(addImage, [image]);
-    // insert the user in the DB using the photo id
-    const sqlQuery = `UPDATE Project SET image=? where id=?`;
-    const ret = await sqlController.queryDataBase(sqlQuery, [
-      insertedImage.insertId,
-      projectId,
+  if (project.image) {
+    // saving again replaces the stored canvas
+    const updateImage = `UPDATE Image SET data=?, mime=? WHERE id=?`;
+    return sqlController.queryDataBase(updateImage, [
+      image.buffer,
+      image.mimetype,
+      project.image,
     ]);
-    return ret;
   }
+  const addImage = `INSERT INTO Image (data,mime) VALUES (?,?)`;
+  const insertedImage = await sqlController.queryDataBase(addImage, [
+    image.buffer,
+    image.mimetype,
+  ]);
+  const sqlQuery = `UPDATE Project SET image=? where id=?`;
+  const ret = await sqlController.queryDataBase(sqlQuery, [
+    insertedImage.insertId,
+    projectId,
+  ]);
+  return ret;
 };
 
 const getImage = async (projectId) => {
-  const photoSQL = `select path from Project join Image on Project.image=Image.id where Project.id=?;`;
+  const photoSQL = `select data,mime from Project join Image on Project.image=Image.id where Project.id=?;`;
   const photo = await sqlController.queryDataBase(photoSQL, [projectId]);
-  console.log(photo);
-  return photo[0].path;
+  return photo[0];
 };
 
 const getCanvas = async (projectId) => {
@@ -79,7 +84,7 @@ const getProjects = async (token, group) => {
   let sqlQuery = `SELECT * FROM Project`;
   const params = [];
   if (token) {
-    const user = jwt.verify(token, process.env.TOKEN_KEY);
+    const user = await auth.verify(token);
     sqlQuery += ` WHERE author=?`;
     params.push(user.id);
 
@@ -114,7 +119,7 @@ const getShared = async (tags) => {
 };
 
 const shareProject = async (token, projectId, tags, description) => {
-  const user = jwt.verify(token, process.env.TOKEN_KEY);
+  const user = await auth.verify(token);
   let sql = `UPDATE Project SET shared=1,description=? WHERE id=? and author=?`;
   const updated = await sqlController.queryDataBase(sql, [
     description,

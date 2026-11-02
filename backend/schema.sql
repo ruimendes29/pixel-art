@@ -1,9 +1,12 @@
 -- Database schema for the Pixel Art backend.
 -- Usage: mysql -u <user> -p <database> < schema.sql
 
+-- Images (profile photos and saved canvases) are stored in the database itself,
+-- so the backend needs no persistent disk.
 CREATE TABLE IF NOT EXISTS Image (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  path VARCHAR(512) NOT NULL
+  data LONGBLOB NOT NULL,
+  mime VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS User (

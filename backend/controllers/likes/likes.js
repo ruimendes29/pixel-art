@@ -1,22 +1,22 @@
-const jwt = require("jsonwebtoken");
+const auth = require("../../resources/auth");
 const sqlQuery = require("../../resources/db");
 
 const likePost = async (token, projectId) => {
-  const user = jwt.verify(token, process.env.TOKEN_KEY);
+  const user = await auth.verify(token);
   const sql = `INSERT INTO Likes (userId,postId) VALUES (?,?)`;
   const inserted = await sqlQuery.queryDataBase(sql, [user.id, projectId]);
   return inserted;
 };
 
 const unlikePost = async (token, projectId) => {
-  const user = jwt.verify(token, process.env.TOKEN_KEY);
+  const user = await auth.verify(token);
   const sql = `DELETE FROM Likes WHERE userId=? and postId=?`;
   const deleted = await sqlQuery.queryDataBase(sql, [user.id, projectId]);
   return deleted;
 };
 
 const doesUserLikePost = async (token, projectId) => {
-  const user = jwt.verify(token, process.env.TOKEN_KEY);
+  const user = await auth.verify(token);
   const sql = `SELECT COUNT(*) as total FROM Likes WHERE userId=? and postId=?`;
   const liked = await sqlQuery.queryDataBase(sql, [user.id, projectId]);
   return liked[0].total > 0;
