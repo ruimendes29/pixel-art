@@ -2,6 +2,8 @@
 
 A free web app for creating pixel art in the browser: draw on a grid, save your artwork, organise it into groups and like other people's creations.
 
+**Live demo:** https://pixel-art-lemon.vercel.app
+
 ## Features
 
 - Grid-based pixel editor with a colour picker
