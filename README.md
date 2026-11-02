@@ -52,7 +52,7 @@ The frontend calls `http://localhost:8080/api` by default. To point it at a depl
 
 ## Deploying
 
-1. **Database:** any MySQL 8 server. Load `backend/schema.sql` once.
+1. **Database:** any MySQL 8 server. Load `backend/schema.sql` once. The project currently uses Aiven's free MySQL plan (console.aiven.io): put the host, port, user, password and database from the service's *Connection information* in `backend/.env`, download its *CA certificate* to `backend/ca.pem` and set `DB_SSL_CA=./ca.pem`. Free Aiven services power off after a period of inactivity; power them back on from the console.
 2. **Backend:** run it on a host that keeps files on disk between restarts (uploaded images are saved to `backend/uploads/`), with the `.env` variables set. Serve it over **HTTPS**: browsers block an HTTPS page from calling an HTTP API.
 3. **Frontend:** build with the backend's address, then deploy the `build/` folder:
 
