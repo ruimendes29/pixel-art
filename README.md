@@ -33,9 +33,12 @@ backend/    Express REST API (controllers/, routers/, resources/)
 ```bash
 cd backend
 cp .env.example .env   # fill in your MySQL credentials and a JWT secret
+mysql -u <user> -p <database> < schema.sql   # create the tables (first time only)
 npm install
-node server.js
+npm start
 ```
+
+The API listens on port 8080 (override with `PORT`). Uploaded images are stored in `backend/uploads/`.
 
 **Frontend**
 
@@ -44,3 +47,5 @@ cd frontend
 npm install
 npm start
 ```
+
+The frontend calls `http://localhost:8080/api` by default. To point it at a deployed backend, set `REACT_APP_API_URL` (for example in `frontend/.env`) before `npm start` or `npm run build`.

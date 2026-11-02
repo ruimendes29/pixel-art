@@ -34,11 +34,7 @@ const Register = () => {
     photo;
 
   const handleRegister = async () => {
-    if (
-      nameInput.isValueValid &&
-      emailInput.isValueValid &&
-      passwordInput.isValueValid
-    ) {
+    if (isFormValid) {
       const formData = new FormData();
 
       const f: File = photo!;
@@ -47,12 +43,12 @@ const Register = () => {
       formData.set("email", emailInput.enteredValue);
       formData.set("password", passwordInput.enteredValue);
 
-      await sendHttp({
+      const registered = await sendHttp({
         url: `${COMMON_URL}/users/add-user`,
         method: "POST",
         body: formData,
       });
-      navigate("/home/login");
+      if (registered) navigate("/home/login");
     }
   };
 

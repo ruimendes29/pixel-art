@@ -4,7 +4,9 @@ const START_LOADING = "START_LOADING";
 const END_LOADING = "END_LOADING";
 const ERROR = "ERROR";
 
-export const COMMON_URL = "http://35.238.193.85:8080/api";
+// Backend address, set REACT_APP_API_URL (e.g. in frontend/.env) when it isn't local
+export const COMMON_URL =
+  process.env.REACT_APP_API_URL || "http://localhost:8080/api";
 
 const reducer = (state: any, action: any) => {
   switch (action.type) {

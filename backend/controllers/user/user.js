@@ -71,6 +71,8 @@ const addUser = async (name, email, password, photo) => {
     return ret;
   } else if (emailUsed) {
     throw new Error("Email is already in use!");
+  } else {
+    throw new Error("Name can not be empty and email must contain a @");
   }
 };
 

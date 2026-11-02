@@ -25,8 +25,6 @@ const upload = multer({
 
 const router = express.Router();
 const controller = require("../../controllers/user/user");
-const { connection } = require("../../global");
-const path = require("path");
 
 //GETS
 
@@ -100,16 +98,20 @@ router.post("/login", async (req, res) => {
     );
 
     res.status(200).jsonp(loginInfo);
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+    res.status(401).jsonp({ error: error.message });
+  }
 });
 
 router.post("/add-user", upload.single("image"), async (req, res) => {
   try {
+    if (!req.file) throw new Error("A profile picture is required!");
     const { name, email, password } = req.body;
     await controller.addUser(name, email, password, req.file.path);
     res.status(200).send({});
   } catch (error) {
-    fs.unlinkSync(req.file.path);
+    if (req.file) fs.unlinkSync(req.file.path);
     console.error(error);
     res.status(401).jsonp({ error: error.message });
   }
@@ -120,7 +122,10 @@ router.post("/add-group/:groupName", async (req, res) => {
     const { groupName } = req.params;
     await controller.addGroup(req.body.token, groupName);
     res.status(200).send({});
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+    res.status(401).jsonp({ error: error.message });
+  }
 });
 
 //DELETES

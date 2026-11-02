@@ -8,7 +8,7 @@ router.get("/own", async (req, res) => {
     const token = req.query.key;
     const groups = await controller.getGroups(token);
     res.status(200).jsonp(groups);
-  } catch (e) {
+  } catch (error) {
     console.error(error);
     res.status(401).jsonp({ error: error.message });
   }

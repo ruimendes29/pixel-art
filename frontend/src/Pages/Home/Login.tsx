@@ -29,7 +29,9 @@ const Login = () => {
       }),
       headers: { "Content-Type": "application/json" },
     });
-    
+    // request failed: the error is shown under the password field
+    if (!loginToken) return;
+
     dispatchRedux(userManagementActions.handleLogin());
     localStorage.setItem("token", loginToken.token);
     navigate("/home");
@@ -46,12 +48,13 @@ const Login = () => {
         error="Name can not be empty!"
       />
       <Input
-        invalid={passwordInput.isInputInvalid}
+        invalid={passwordInput.isInputInvalid || httpInfo.error}
         onChange={passwordInput.valueChanged}
         value={passwordInput.enteredValue}
         onBlur={passwordInput.touchedHandler}
         name="Password"
         type="password"
+        error={httpInfo.error ? httpInfo.error.message : undefined}
       />
       <Button
         onClick={() => {
