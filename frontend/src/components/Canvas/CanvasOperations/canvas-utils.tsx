@@ -1,4 +1,11 @@
-import { BRUSH_INTERVAL, paintedSquares } from "./canvas-stored";
+import { paintedSquares } from "./canvas-stored";
+import {
+  eraseCells,
+  getBrushRadius,
+  getCellAt,
+  getCellColor,
+  paintCells,
+} from "./grid-helpers";
 import store, { canvasActions } from "../../../store/redux-store";
 
 export enum Brushes {
@@ -120,23 +127,24 @@ export const paintSquare = (
   zoomedSquaredSize: number,
   ctx: CanvasRenderingContext2D
 ) => {
-  const realCol = Math.floor((x - sc * zoomedSquaredSize) / zoomedSquaredSize);
-  const col = sc + Math.floor((x - sc * zoomedSquaredSize) / zoomedSquaredSize);
-  const realRow = Math.floor((y - sr * zoomedSquaredSize) / zoomedSquaredSize);
-  const row = sr + Math.floor((y - sr * zoomedSquaredSize) / zoomedSquaredSize);
-  const brushSizeAux = Math.round(
-    store.getState().canvas.size / BRUSH_INTERVAL
+  const { col: realCol, row: realRow } = getCellAt(
+    x,
+    y,
+    sc,
+    sr,
+    zoomedSquaredSize
   );
+  const col = sc + realCol;
+  const row = sr + realRow;
+  const brushSizeAux = getBrushRadius(store.getState().canvas.size);
   ctx.fillStyle = store.getState().canvas.color;
-  for (let r = realRow - brushSizeAux; r <= realRow + brushSizeAux; r++) {
-    for (let c = realCol - brushSizeAux; c <= realCol + brushSizeAux; c++) {
-      if (!paintedSquares.has(r)) {
-        paintedSquares.set(r, new Map());
-      }
-      const colMap = paintedSquares.get(r)!;
-      colMap.set(c, ctx.fillStyle.toString());
-    }
-  }
+  paintCells(
+    paintedSquares,
+    realCol,
+    realRow,
+    brushSizeAux,
+    ctx.fillStyle.toString()
+  );
   ctx.clearRect(
     (col - brushSizeAux) * zoomedSquaredSize,
     (row - brushSizeAux) * zoomedSquaredSize,
@@ -168,14 +176,13 @@ export const getPositionOnCanvas = (
   canvasInfo: any
 ) => {
   const { x, y } = getMousePos(canvas, e);
-  const zoomedSquaredSize = canvasInfo.zoom * canvasInfo.squareSize;
-  const realCol = Math.floor(
-    (x - canvasInfo.startCol * zoomedSquaredSize) / zoomedSquaredSize
+  return getCellAt(
+    x,
+    y,
+    canvasInfo.startCol,
+    canvasInfo.startRow,
+    canvasInfo.zoom * canvasInfo.squareSize
   );
-  const realRow = Math.floor(
-    (y - canvasInfo.startRow * zoomedSquaredSize) / zoomedSquaredSize
-  );
-  return { col: realCol, row: realRow };
 };
 
 export const clearSquare = (
@@ -186,24 +193,17 @@ export const clearSquare = (
   zoomedSquaredSize: number,
   ctx: CanvasRenderingContext2D
 ) => {
-  const realCol = Math.floor((x - sc * zoomedSquaredSize) / zoomedSquaredSize);
-  const col = sc + Math.floor((x - sc * zoomedSquaredSize) / zoomedSquaredSize);
-  const realRow = Math.floor((y - sr * zoomedSquaredSize) / zoomedSquaredSize);
-  const row = sr + Math.floor((y - sr * zoomedSquaredSize) / zoomedSquaredSize);
-  const brushSizeAux = Math.round(
-    store.getState().canvas.size / BRUSH_INTERVAL
+  const { col: realCol, row: realRow } = getCellAt(
+    x,
+    y,
+    sc,
+    sr,
+    zoomedSquaredSize
   );
-  for (let r = realRow - brushSizeAux; r <= realRow + brushSizeAux; r++) {
-    for (let c = realCol - brushSizeAux; c <= realCol + brushSizeAux; c++) {
-      if (!paintedSquares.has(r)) {
-        paintedSquares.set(r, new Map());
-      }
-      const colMap = paintedSquares.get(r)!;
-      if (colMap.has(c)) {
-        colMap.delete(c);
-      }
-    }
-  }
+  const col = sc + realCol;
+  const row = sr + realRow;
+  const brushSizeAux = getBrushRadius(store.getState().canvas.size);
+  eraseCells(paintedSquares, realCol, realRow, brushSizeAux);
 
   ctx.beginPath();
 
@@ -233,8 +233,13 @@ export const fillBucket = (
   zoomedSquaredSize: number,
   ctx: CanvasRenderingContext2D
 ) => {
-  const realCol = Math.floor((x - sc * zoomedSquaredSize) / zoomedSquaredSize);
-  const realRow = Math.floor((y - sr * zoomedSquaredSize) / zoomedSquaredSize);
+  const { col: realCol, row: realRow } = getCellAt(
+    x,
+    y,
+    sc,
+    sr,
+    zoomedSquaredSize
+  );
   let hasColor = false;
   let colorToLookFor = "";
   let current: any = { col: realCol, row: realRow };
@@ -328,12 +333,10 @@ export const pickColor = (
   sr: number,
   zoomedSquaredSize: number
 ) => {
-  const c = Math.floor((x - sc * zoomedSquaredSize) / zoomedSquaredSize);
-  const r = Math.floor((y - sr * zoomedSquaredSize) / zoomedSquaredSize);
-  if (paintedSquares.has(r) && paintedSquares.get(r)!.has(c)) {
-    store.dispatch(
-      canvasActions.changeColor({ color: paintedSquares.get(r)!.get(c)! })
-    );
+  const { col, row } = getCellAt(x, y, sc, sr, zoomedSquaredSize);
+  const color = getCellColor(paintedSquares, col, row);
+  if (color !== undefined) {
+    store.dispatch(canvasActions.changeColor({ color }));
     return true;
   }
   return false;
