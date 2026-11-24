@@ -1,5 +1,7 @@
 # Pixel Art
 
+[![CI](https://github.com/ruimendes29/pixel-art/actions/workflows/ci.yml/badge.svg)](https://github.com/ruimendes29/pixel-art/actions/workflows/ci.yml)
+
 A free web app for creating pixel art in the browser: draw on a grid, save your artwork, organise it into groups and like other people's creations.
 
 **Live demo:** https://pixel-art-lemon.vercel.app
@@ -52,6 +54,21 @@ npm start
 ```
 
 The frontend calls `http://localhost:8080/api` by default. To point it at a deployed backend, set `REACT_APP_API_URL` (for example in `frontend/.env`) before `npm start` or `npm run build`.
+
+## Development / Testing
+
+All commands run in `frontend/`.
+
+```bash
+npm test                          # Vitest unit tests for the grid helpers
+npm run build                     # production build, also used by the E2E tests
+npx playwright install chromium   # first time only
+npm run test:e2e                  # Playwright E2E tests against the build
+```
+
+The Playwright tests serve `build/` on port 4173 and drive the editor as a guest, so they need neither the API nor MySQL; any request to `/api` is intercepted and fails the test. They check that painting a cell changes the canvas pixels, that the eraser clears them, that the eyedropper picks a painted colour and that *Download as PNG* saves a real PNG file. Run `npm run build` again after changing the source.
+
+GitHub Actions (`.github/workflows/ci.yml`) runs the build, Vitest and Playwright (Chromium) on every push and pull request, and uploads the Playwright report when a test fails.
 
 ## Deploying
 
