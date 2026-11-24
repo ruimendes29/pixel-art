@@ -14,7 +14,7 @@
 
 .name{
   text-align: left;
-  font-size: 1.3rem;
+  font-size: var(--fs-sm);
   color: var(--primary-color);
   margin-bottom: 0.5rem;
 }

@@ -4,7 +4,7 @@
 
 .not-logged {
   margin-top: 2rem;
-  font-size: 2rem;
+  font-size: var(--fs-lg);
   color: var(--primary-color, black);
   text-align: center;
 }

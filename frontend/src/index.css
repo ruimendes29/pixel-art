@@ -4,6 +4,26 @@
   --primary-color: #3bbfbf;
   --secondary-color: #55c7c7;
   --error-color: #ff5454;
+
+  /* Type scale (~1.25 ratio). Use these instead of raw rem values. */
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-md: 1.125rem;
+  --fs-lg: 1.375rem;
+  --fs-xl: clamp(1.5rem, 1.1rem + 1.6vw, 2.125rem);
+
+  /* Password strength steps: 0 to 5 requirements met */
+  --strength-1: #ff5454;
+  --strength-2: #ff8a3d;
+  --strength-3: #f2c230;
+  --strength-4: #9bcf3a;
+  --strength-5: #2fae8f;
+}
+
+body {
+  font-size: var(--fs-base);
+  line-height: 1.5;
 }
 
 * {

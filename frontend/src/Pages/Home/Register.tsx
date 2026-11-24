@@ -1,9 +1,12 @@
 import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AvatarCropModal from "../../components/UI/AvatarCropModal";
 import Button from "../../components/UI/Button";
 import Input from "../../components/UI/Input";
+import PasswordMeter from "../../components/UI/PasswordMeter";
+import { isPasswordStrong } from "../../components/UI/password-rules";
 import useHttp, { COMMON_URL } from "../../hooks/use-http";
 import useInput from "../../hooks/use-input";
 import classes from "./Register.module.css";
@@ -11,22 +14,24 @@ import classes from "./Register.module.css";
 const Register = () => {
   const nameInput = useInput((el: string) => el.trim() !== "");
   const [httpInfo, sendHttp] = useHttp();
-  const passwordInput = useInput((el: string) => {
-    return (
-      /[0-9]/.test(el) &&
-      /[`!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/.test(el) &&
-      /[A-Z]/.test(el) &&
-      /[a-z]/.test(el)
-    );
-  });
+  const passwordInput = useInput(isPasswordStrong);
   const emailInput = useInput((el: string) => {
     return el.includes("@");
   });
 
   const navigate = useNavigate();
 
-  const imgRef = useRef(null);
-  const [photo, setPhoto]: [File | undefined, any] = useState(undefined);
+  const imgRef = useRef<HTMLInputElement>(null);
+  const [photo, setPhoto] = useState<File>();
+  const [pendingPhoto, setPendingPhoto] = useState<File>();
+  const [photoUrl, setPhotoUrl] = useState("");
+
+  useEffect(() => {
+    if (!photo) return;
+    const url = URL.createObjectURL(photo);
+    setPhotoUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [photo]);
   const isFormValid =
     nameInput.isValueValid &&
     emailInput.isValueValid &&
@@ -70,10 +75,10 @@ const Register = () => {
           onChange={passwordInput.valueChanged}
           value={passwordInput.enteredValue}
           onBlur={passwordInput.touchedHandler}
-          error="Password must contain one upper case, one lower case, one number and one special character"
           name="Password"
           type="password"
         />
+        <PasswordMeter value={passwordInput.enteredValue} />
         <Input
           className={`${classes.ipt}`}
           invalid={emailInput.isInputInvalid || httpInfo.error}
@@ -104,14 +109,25 @@ const Register = () => {
         className={`${classes.invisible}`}
         ref={imgRef}
         type="file"
+        accept="image/*"
         onChange={(e) => {
-          setPhoto(e.target!.files![0]);
+          if (e.target.files?.[0]) setPendingPhoto(e.target.files[0]);
+          e.target.value = ""; // lets the same file be picked again
         }}
       />
+      {pendingPhoto && (
+        <AvatarCropModal
+          file={pendingPhoto}
+          onCancel={() => setPendingPhoto(undefined)}
+          onSave={(cropped) => {
+            setPhoto(cropped);
+            setPendingPhoto(undefined);
+          }}
+        />
+      )}
       <div
         onClick={() => {
-          const input: HTMLInputElement = imgRef.current!;
-          input.click();
+          imgRef.current!.click();
         }}
         className={`${photo ? classes["has-photo"] : ""} ${
           classes["image-held"]
@@ -119,7 +135,7 @@ const Register = () => {
       >
         {!photo && <div>Upload an Image</div>}
         {photo && (
-          <img src={URL.createObjectURL(photo)} alt="uploaded profile" />
+          <img src={photoUrl} alt="Your profile" />
         )}
       </div>
     </div>

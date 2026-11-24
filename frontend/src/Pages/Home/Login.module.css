@@ -1,6 +1,6 @@
 .btn {
   width: 100%;
-  font-size: 1.8rem;
+  font-size: var(--fs-md);
   max-width: 500px;
 }
 

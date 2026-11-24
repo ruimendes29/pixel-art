@@ -5,7 +5,7 @@
 }
 
 .search-header{
-  font-size: 1.5rem;
+  font-size: var(--fs-base);
   width: 100%;
   display: grid;
   justify-content: space-between;
@@ -30,6 +30,6 @@
 .no-tags{
   width: 50%;
   justify-self: center;
-  font-size: 1.5rem;
+  font-size: var(--fs-base);
   padding: 0.83rem;
 }

@@ -23,6 +23,6 @@
 .name{
     position: absolute;
     bottom: 1rem;
-    font-size: 1.5rem;
+    font-size: var(--fs-base);
     color: var(--primary-color, black);
 }

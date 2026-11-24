@@ -1,6 +1,6 @@
 .counter{
     color: var(--primary-color,black);
-    font-size: 1.5rem;
+    font-size: var(--fs-base);
     background-color: white;
     display: flex;
     justify-content: space-around;

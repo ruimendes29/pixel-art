@@ -5,7 +5,7 @@
   flex-direction: column;
   align-items: center;
   padding: 1rem;
-  font-size: 1.5rem;
+  font-size: var(--fs-base);
   gap: 1rem;
   min-height: 80vh;
 }
@@ -17,7 +17,7 @@
   grid-column: 1/3;
   width: 80%;
   height: 50vh;
-  font-size: 1.5rem;
+  font-size: var(--fs-base);
   color:var(--primary-color,black);
   padding: 1rem;
 }
@@ -34,7 +34,7 @@
 .category {
   cursor: pointer;
   background-color: white;
-  font-size: 1.2rem;
+  font-size: var(--fs-sm);
   padding: 1rem 0.5rem;
   display: flex;
   justify-content: space-between;

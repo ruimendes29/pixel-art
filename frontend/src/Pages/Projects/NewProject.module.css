@@ -4,12 +4,12 @@
 
 .group-input {
   font-weight: 500;
-  font-size: 2rem;
+  font-size: var(--fs-lg);
   color: var(--primary-color);
 }
 
 .groups {
-  font-size: 1.3rem;
+  font-size: var(--fs-sm);
   width: 100%;
   border-color: var(--primary-color);
   background-color: white;

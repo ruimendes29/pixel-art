@@ -2,7 +2,7 @@
     justify-self: center;
     text-align: center;
     color: var(--primary-color,black);
-    font-size: 1.5rem;
+    font-size: var(--fs-base);
     font-weight: 400;
     background-color: white;
 }
@@ -55,7 +55,7 @@
 .author-name{
     font-weight: 600;
     white-space: nowrap;
-    font-size: 1.3rem;
+    font-size: var(--fs-sm);
 }
 
 .description{
@@ -69,7 +69,7 @@
 }
 
 .guest-like{
-    font-size: 1.3rem;
+    font-size: var(--fs-sm);
     text-align: center;
     align-self: center;
 }
