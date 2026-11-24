@@ -1,5 +1,11 @@
 const sqlController = require("../../resources/db");
 const auth = require("../../resources/auth");
+const {
+  normalizeTags,
+  parseTagsQuery,
+  parseSearchQuery,
+  escapeLike,
+} = require("../../resources/tags");
 require("dotenv").config();
 
 const createProject = async (
@@ -101,25 +107,33 @@ const getProjects = async (token, group) => {
   return projectsRows;
 };
 
-const getShared = async (tags) => {
-  console.log(tags);
-  const parsedTags = JSON.parse(tags);
-  // `IN (?)` expands an array into a list of escaped values
-  const sql =
-    parsedTags.length > 0
-      ? `SELECT Project.* FROM Project join
-  (SELECT * FROM (SELECT projectId,Count(*) as numberOfTags FROM Tag where name in (?) group by projectId) as tags where numberOfTags=?)
-   as fullProjects on Project.id=projectId WHERE shared=1`
-      : `SELECT * FROM Project where shared=1`;
-  const shared = await sqlController.queryDataBase(sql, [
-    parsedTags,
-    parsedTags.length,
-  ]);
-  return shared;
+// Shared projects that have every tag asked for (ignoring case) and whose name
+// or description contains the search text, newest first.
+const getShared = async (tagsQuery, searchQuery) => {
+  const tags = parseTagsQuery(tagsQuery).map((t) => t.toLowerCase());
+  const search = parseSearchQuery(searchQuery);
+  const params = [];
+  let sql = `SELECT Project.* FROM Project`;
+  if (tags.length > 0) {
+    // `IN (?)` expands an array into a list of escaped values
+    sql += ` JOIN (SELECT projectId FROM Tag WHERE LOWER(name) IN (?)
+      GROUP BY projectId HAVING COUNT(DISTINCT LOWER(name)) = ?) AS tagged
+      ON Project.id = tagged.projectId`;
+    params.push(tags, tags.length);
+  }
+  sql += ` WHERE shared=1`;
+  if (search) {
+    const pattern = `%${escapeLike(search.toLowerCase())}%`;
+    sql += ` AND (LOWER(Project.name) LIKE ? OR LOWER(COALESCE(Project.description,'')) LIKE ?)`;
+    params.push(pattern, pattern);
+  }
+  sql += ` ORDER BY Project.id DESC`;
+  return sqlController.queryDataBase(sql, params);
 };
 
-const shareProject = async (token, projectId, tags, description) => {
+const shareProject = async (token, projectId, rawTags, description) => {
   const user = await auth.verify(token);
+  const tags = normalizeTags(rawTags ?? []);
   let sql = `UPDATE Project SET shared=1,description=? WHERE id=? and author=?`;
   const updated = await sqlController.queryDataBase(sql, [
     description,

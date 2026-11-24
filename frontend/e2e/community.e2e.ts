@@ -15,7 +15,7 @@ const openCommunity = async (page: Page) => {
   await page.getByRole("button", { name: "Enter as guest" }).click();
   await page.getByRole("button", { name: "Community" }).click();
   await expect(page).toHaveURL(/\/community$/);
-  await expect(page.getByRole("button", { name: "No tag selected" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Filter by tags" })).toBeVisible();
   return errors;
 };
 

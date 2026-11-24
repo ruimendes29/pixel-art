@@ -6,17 +6,29 @@ import Button from "../../components/UI/Button";
 import Modal from "../../components/UI/Modal";
 
 import classes from "./FilterModal.module.css";
+import {
+  CUSTOM_CATEGORY,
+  hasTag,
+  isPresetTag,
+  MAX_TAG_LENGTH,
+  normalizeTag,
+  PRESET_TAGS,
+} from "./tags";
 
-const tags: Map<string, string[]> = new Map();
-tags.set("Anime", ["Naruto", "Pokemon", "Death Note", "Doraemon"]);
-tags.set("Soccer", ["Ronaldo", "Messi", "Aubameyang"]);
-tags.set("Animals", ["Dogs", "Cats", "Horses"]);
-tags.set("Cities", ["London", "Porto", "Milan"]);
-tags.set("Custom", []);
+const tags = new Map<string, string[]>([...PRESET_TAGS, [CUSTOM_CATEGORY, []]]);
 
 const FilterModal = (props: any) => {
   const textRef = useRef(null);
   const [choseTags, setChoseTags] = useState(false);
+  const [newTag, setNewTag] = useState("");
+  const customTags: string[] = props.selectedTags.filter((t: string) => !isPresetTag(t));
+
+  const addCustomTag = (e: React.FormEvent) => {
+    e.preventDefault();
+    const tag = normalizeTag(newTag);
+    if (tag && !hasTag(props.selectedTags, tag)) props.onSelectTag(tag);
+    setNewTag("");
+  };
   const [selectedCategory, setSelectedCategory] = useState(
     Array.from(tags)[0][0]
   );
@@ -38,6 +50,12 @@ const FilterModal = (props: any) => {
                   {Array.from(tags).map(([el]) => (
                     <div
                       key={el}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={selectedCategory === el}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") setSelectedCategory(el);
+                      }}
                       onClick={() => {
                         setSelectedCategory(el);
                       }}
@@ -49,13 +67,45 @@ const FilterModal = (props: any) => {
                   ))}
                 </div>
                 <div className={`${classes["right-panel"]}`}>
-                  {selectedCategory !== "Custom" && (
+                  {selectedCategory === CUSTOM_CATEGORY && (
+                    <div className={classes.custom}>
+                      <form className={classes["custom-form"]} onSubmit={addCustomTag}>
+                        <input
+                          aria-label="New tag"
+                          placeholder="Type a tag, like Retro games"
+                          maxLength={MAX_TAG_LENGTH}
+                          value={newTag}
+                          onChange={(e) => setNewTag(e.target.value)}
+                        />
+                        <Button primary disabled={!normalizeTag(newTag)}>
+                          Add tag
+                        </Button>
+                      </form>
+                      {customTags.length === 0 ? (
+                        <p className={classes.hint}>Tags you add show up here. Click one to remove it.</p>
+                      ) : (
+                        <div className={classes.categories}>
+                          {customTags.map((el) => (
+                            <Button
+                              key={el}
+                              onClick={() => props.onSelectTag(el)}
+                              className={`${classes.tag}`}
+                              primary
+                            >
+                              {el}
+                            </Button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {selectedCategory !== CUSTOM_CATEGORY && (
                     <Fragment>
                       <Button
                         onClick={() => {
                           tags
                             .get(selectedCategory)!
-                            .filter((el) => !props.selectedTags.includes(el))
+                            .filter((el) => !hasTag(props.selectedTags, el))
                             .forEach((el) => props.onSelectTag(el));
                         }}
                         className={`${classes["add-all"]}`}
@@ -67,7 +117,7 @@ const FilterModal = (props: any) => {
                         onClick={() => {
                           tags
                             .get(selectedCategory)!
-                            .filter((el) => props.selectedTags.includes(el))
+                            .filter((el) => hasTag(props.selectedTags, el))
                             .forEach((el) => props.onSelectTag(el));
                         }}
                         className={`${classes["remove-all"]}`}
@@ -83,8 +133,8 @@ const FilterModal = (props: any) => {
                               props.onSelectTag(el);
                             }}
                             className={`${classes.tag}`}
-                            primary={props.selectedTags.includes(el)}
-                            secondary={!props.selectedTags.includes(el)}
+                            primary={hasTag(props.selectedTags, el)}
+                            secondary={!hasTag(props.selectedTags, el)}
                           >
                             {el}
                           </Button>

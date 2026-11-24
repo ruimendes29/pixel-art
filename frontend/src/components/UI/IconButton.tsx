@@ -6,12 +6,15 @@ import classes from "./IconButton.module.css";
 const IconButton = (props: {
   style?:any
   className?: any;
+  label?: string;
   onClick: any;
   icon: IconProp;
 }) => {
   return (
     <button
       className={`${classes["icon-button"]}`}
+      aria-label={props.label}
+      title={props.label}
       onClick={props.onClick}
     >
       <FontAwesomeIcon className={`${props.className} ${classes.icon}`} icon={props.icon} />

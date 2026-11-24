@@ -13,7 +13,7 @@ const Chip = (props: any) => {
     >
       {props.children}
       {props.clickable && (
-        <IconButton onClick={props.onDelete} icon={faXmark}/>
+        <IconButton onClick={props.onDelete} icon={faXmark} label={`Remove ${props.children}`} />
       )}
     </div>
   );

@@ -23,6 +23,7 @@ import ReferenceImage from "../../components/Functionalities/ReferenceImage";
 import useHttp, { COMMON_URL } from "../../hooks/use-http";
 import { canvasActions } from "../../store/redux-store";
 import FilterModal from "../Community/FilterModal";
+import { toggleTag } from "../Community/tags";
 import classes from "./CanvasPage.module.css";
 
 function dataURItoBlob(dataURI: string) {
@@ -284,11 +285,7 @@ const CanvasPage = () => {
           onClose={() => setOpenedShareModal(false)}
           selectedTags={tags}
           onSelectTag={(tag: string) => {
-            setTags((oldTags: string[]) => {
-              if (oldTags.includes(tag))
-                return [...oldTags].filter((el) => el !== tag);
-              else return [...oldTags, tag];
-            });
+            setTags((oldTags: string[]) => toggleTag(oldTags, tag));
           }}
         />
       )}

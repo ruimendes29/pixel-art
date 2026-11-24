@@ -11,9 +11,14 @@
   box-sizing: border-box;
 }
 
+/* Small spinner in the middle of the page while the project loads */
 .loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin: -1rem 0 0 -1rem;
   color: var(--primary-color, black);
-  font-size: 50vh;
+  font-size: 2rem;
 }
 
 .not-owner {

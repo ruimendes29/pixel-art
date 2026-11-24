@@ -1,125 +1,74 @@
-import {
-  faCaretLeft,
-  faCaretRight,
-  faFilter,
-} from "@fortawesome/free-solid-svg-icons";
-import React, { Fragment, useState } from "react";
-import Button from "../../components/UI/Button";
+import { faFilter } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { Fragment, useEffect, useState } from "react";
 import Chip from "../../components/UI/Chip";
-import IconButton from "../../components/UI/IconButton";
-import useInput from "../../hooks/use-input";
 import classes from "./Community.module.css";
 import FilterModal from "./FilterModal";
 import Posts from "./Posts/Posts";
 import SearchBar from "./SearchBar";
+import { toggleTag } from "./tags";
+
+export const SEARCH_DEBOUNCE_MS = 150;
 
 const Community = () => {
-  const [selectedCategories, setSelectedCategories]: [string[], any] = useState(
-    []
-  );
-  const [categoryIndex, setCategoryIndex] = useState(0);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
 
-  const searchInput = useInput((el: string) => {
-    return el.length < 30;
-  });
+  // What is typed, and what is searched: the search waits 150 ms after the last keystroke
+  const [searchText, setSearchText] = useState("");
+  const [search, setSearch] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => setSearch(searchText.trim()), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [searchText]);
 
-  const handleChipDelete = (el: string) => {
-    setSelectedCategories((categories: any[]) =>
-      categories.filter((element) => element !== el)
-    );
-    setCategoryIndex((p) => {
-      if (p > 0) return p - 1;
-      else return p;
-    });
-  };
-
-  const handleSelectTag = (el: string) => {
-    if (selectedCategories.includes(el)) {
-      setSelectedCategories((oldCategories: any[]) =>
-        oldCategories.filter((category) => category !== el)
-      );
-    } else
-      setSelectedCategories((oldCategories: any) => [...oldCategories, el]);
-  };
-
-  const handleLeftPress = () => {
-    setCategoryIndex((p) => {
-      if (categoryIndex - 1 >= 0) return p - 1;
-      else return p;
-    });
-  };
-
-  const handleRightPress = () => {
-    setCategoryIndex((p) => {
-      if (categoryIndex + 2 < selectedCategories.length) return p + 1;
-      else return p;
-    });
-  };
+  const handleSelectTag = (tag: string) => setSelectedTags((old) => toggleTag(old, tag));
 
   return (
     <Fragment>
       <div className={`${classes.community}`}>
         <div className={`${classes["search-header"]}`}>
-          <SearchBar searchInput={searchInput} />
-          {selectedCategories.length > 0 && (
-            <div className={`${classes.categories}`}>
-              <IconButton
-                className={`${categoryIndex - 1 >= 0 ? "" : classes.invalid}`}
-                onClick={handleLeftPress}
-                icon={faCaretLeft}
-              />
-              {selectedCategories
-                .slice(categoryIndex, categoryIndex + 2)
-                .map((el) => (
-                  <Chip
-                    key={el}
-                    onDelete={() => {
-                      handleChipDelete(el);
-                    }}
-                    className={`${classes.chip}`}
-                    secondary
-                    clickable
-                  >
-                    {el}
-                  </Chip>
-                ))}
-              <IconButton
-                className={`${
-                  categoryIndex + 2 < selectedCategories.length
-                    ? ""
-                    : classes.invalid
-                } `}
-                onClick={handleRightPress}
-                icon={faCaretRight}
-              />
-            </div>
-          )}
-          {selectedCategories.length === 0 && (
-            <Button
-              onClick={() => {
-                setShowModal((sm) => !sm);
-              }}
-              className={`${classes["no-tags"]}`}
-              secondary
-            >
-              No tag selected
-            </Button>
-          )}
-          <IconButton
-            style={{ justifySelf: "end" }}
-            icon={faFilter}
-            onClick={() => {
-              setShowModal((sm) => !sm);
+          <SearchBar
+            value={searchText}
+            onChange={(value) => {
+              setSearchText(value);
+              if (!value) setSearch(""); // clearing applies at once
             }}
           />
+          <div className={classes.filters}>
+            {selectedTags.length > 0 && (
+              <ul className={classes.tags} aria-label="Selected tags">
+                {selectedTags.map((tag) => (
+                  <li key={tag}>
+                    <Chip onDelete={() => handleSelectTag(tag)} secondary clickable>
+                      {tag}
+                    </Chip>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button
+              className={classes["filter-button"]}
+              aria-label="Filter by tags"
+              title="Filter by tags"
+              aria-expanded={showModal}
+              onClick={() => setShowModal((open) => !open)}
+            >
+              <FontAwesomeIcon icon={faFilter} />
+              {selectedTags.length > 0 && (
+                <span className={classes.count} aria-hidden>
+                  {selectedTags.length}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
-        <Posts selectedCategories={selectedCategories} />
+        <Posts selectedCategories={selectedTags} search={search} />
       </div>
       {showModal && (
         <FilterModal
           onSelectTag={handleSelectTag}
-          selectedTags={selectedCategories}
+          selectedTags={selectedTags}
           onClose={() => setShowModal(false)}
         />
       )}

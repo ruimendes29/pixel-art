@@ -1,20 +1,37 @@
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
-import React from 'react'
-import IconButton from '../../components/UI/IconButton'
-import classes from './SearchBar.module.css'
+import { faMagnifyingGlass, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
+import classes from "./SearchBar.module.css";
 
-const SearchBar = (props:any) => {
+// Searches as you type; the magnifier turns into a button that clears the search.
+const SearchBar = (props: { value: string; onChange: (value: string) => void }) => {
   return (
     <div className={`${classes["search-bar"]}`}>
-            <input
-              value={props.searchInput.enteredValue}
-              onChange={props.searchInput.valueChanged}
-              onBlur={props.searchInput.touchedHandler}
-              type="text"
-            />
-            <IconButton onClick={() => {}} icon={faMagnifyingGlass} />
-          </div>
-  )
-}
+      <input
+        type="search"
+        aria-label="Search posts"
+        placeholder="Search by name or description"
+        maxLength={100}
+        value={props.value}
+        onChange={(e) => props.onChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") props.onChange("");
+        }}
+      />
+      {props.value ? (
+        <button
+          className={classes.clear}
+          aria-label="Clear search"
+          title="Clear search"
+          onClick={() => props.onChange("")}
+        >
+          <FontAwesomeIcon icon={faXmark} />
+        </button>
+      ) : (
+        <FontAwesomeIcon className={classes.icon} icon={faMagnifyingGlass} aria-hidden />
+      )}
+    </div>
+  );
+};
 
-export default SearchBar
+export default SearchBar;

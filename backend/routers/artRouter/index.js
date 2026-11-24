@@ -137,7 +137,7 @@ router.get("/is-shared/:id", async (req, res) => {
 router.get("/shared-projects", async (req, res) => {
   try {
     const tags = req.query.tags;
-    const projects = await controller.getShared(tags);
+    const projects = await controller.getShared(tags, req.query.search);
     res.status(200).jsonp(projects);
   } catch (error) {
     console.error(error);
