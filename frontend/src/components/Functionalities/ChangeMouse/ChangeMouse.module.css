@@ -1,37 +1,27 @@
-.change-mouse-holder{
-    color: var(--primary-color);
-    position: relative;
-    width: min(100%,400px);
-    display: flex;
-    gap: 3px;
-    align-items: center;
-    justify-content: space-around;
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
 }
 
-.size{
-    aspect-ratio: 1/1;
-    border-radius: 50%;
+.size {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
 }
 
-.slider{
-    position: absolute;
-    top: 15rem;
+.dot {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(31, 59, 59, 0.25);
 }
 
-.selected{
-    -webkit-box-shadow:inset 0px 0px 0px 2px var(--primary-color)!important;
-    -moz-box-shadow:inset 0px 0px 0px 2px var(--primary-color)!important;
-    box-shadow:inset 0px 0px 0px 2px var(--primary-color)!important;
-}
-
-.option{
-    min-width: calc(var(--container-height) - 1rem);
-    min-height: calc(var(--container-height) - 1rem);
-    border-radius: 50%;
-    font-size: xx-large;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0px 4px 5px 2px rgba(0, 0, 0, 0.25);
+.size > input {
+  width: 6rem;
+  accent-color: var(--primary-color);
 }

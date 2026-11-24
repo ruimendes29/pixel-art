@@ -1,5 +1,5 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import IconButton from "../../../UI/IconButton";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classes from "./Pallete.module.css";
 
 const Pallete = (props: {
@@ -10,30 +10,26 @@ const Pallete = (props: {
   return (
     <div className={`${classes.pallete}`}>
       {[...Array(9).keys()].map((index) => {
+        const color = props.colors[index];
         return (
-          <div
+          <button
             key={index}
-            onClick={() => {
-              if (index < props.colors.length) {
-                props.onClickedColor(props.colors[index]);
-              }
-            }}
-            style={{
-              backgroundColor: `${
-                index < props.colors.length ? props.colors[index] : "white"
-              }`,
-            }}
+            disabled={!color}
+            aria-label={color ? `Use colour ${color}` : "Empty palette slot"}
+            onClick={() => props.onClickedColor(color)}
+            style={{ backgroundColor: color || "white" }}
             className={`${classes["color-holder"]}`}
-          ></div>
+          />
         );
       })}
-      <IconButton
-        className={`${classes["color-holder"]}`}
-        icon={faPlus}
-        onClick={() => {
-          props.onAddColor();
-        }}
-      />
+      <button
+        aria-label="Save colour to palette"
+        title="Save colour to palette"
+        onClick={() => props.onAddColor()}
+        className={`${classes["color-holder"]} ${classes.add}`}
+      >
+        <FontAwesomeIcon icon={faPlus} />
+      </button>
     </div>
   );
 };

@@ -59,8 +59,9 @@ const clickCell = async (page: Page, col: number, row: number) =>
   canvas(page).click({ position: await cellPosition(page, col, row) });
 
 const selectTool = async (page: Page, tool: string) => {
-  await page.getByRole("button", { name: "Drawing tools" }).click();
-  await page.getByRole("button", { name: tool, exact: true }).click();
+  const button = page.getByRole("button", { name: tool, exact: true });
+  await button.click();
+  await expect(button).toHaveAttribute("aria-pressed", "true");
 };
 
 const setColour = async (page: Page, hex: string) => {
@@ -106,11 +107,43 @@ test("Download as PNG saves a PNG file", async ({ page }) => {
   await clickCell(page, 0, 0);
 
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Download as PNG" }).click();
+  await page.getByRole("button", { name: "Project actions" }).click();
+  await page.getByRole("menuitem", { name: "Download as PNG" }).click();
   const download = await downloadPromise;
 
   expect(download.suggestedFilename()).toBe("project.png");
   const file = await readFile(await download.path());
   // PNG signature: \x89 P N G \r \n \x1a \n
   expect([...file.subarray(0, 8)]).toEqual([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+});
+
+test("the toolbar sits under the centred canvas", async ({ page }) => {
+  const box = (await canvas(page).boundingBox())!;
+  const toolbar = (await page.getByRole("toolbar", { name: "Canvas tools" }).boundingBox())!;
+  const viewport = page.viewportSize()!;
+
+  expect(toolbar.y).toBeGreaterThan(box.y + box.height);
+  expect(Math.abs(box.x + box.width / 2 - viewport.width / 2)).toBeLessThan(4);
+});
+
+test("the actions menu closes on Escape", async ({ page }) => {
+  await page.getByRole("button", { name: "Project actions" }).click();
+  await expect(page.getByRole("menu")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("menu")).toBeHidden();
+});
+
+test("a reference image is set behind the canvas and can be removed", async ({ page }) => {
+  await page.getByLabel("Reference image file").setInputFiles({
+    name: "ref.png",
+    mimeType: "image/png",
+    // 1x1 transparent PNG
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+      "base64"
+    ),
+  });
+  await expect(page.getByRole("button", { name: "Change reference image" })).toBeVisible();
+  await page.getByRole("button", { name: "Remove reference image" }).click();
+  await expect(page.getByRole("button", { name: "Add reference image" })).toBeVisible();
 });

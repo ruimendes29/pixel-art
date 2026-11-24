@@ -19,6 +19,7 @@ import {
   rgbToHex,
 } from "../../components/Canvas/CanvasOperations/canvas-utils";
 import Functionalities from "../../components/Functionalities/Functionalities";
+import ReferenceImage from "../../components/Functionalities/ReferenceImage";
 import useHttp, { COMMON_URL } from "../../hooks/use-http";
 import { canvasActions } from "../../store/redux-store";
 import FilterModal from "../Community/FilterModal";
@@ -245,12 +246,9 @@ const CanvasPage = () => {
       <div className={`${classes.under}`}>
         {isOwner && (
           <Fragment>
-            <div className={`${classes.c}`}>
-              <Canvas ref={canvasRef} />
-            </div>
-            <div className={`${classes.f}`}>
-              <Functionalities
-                id={params.id!}
+            <ReferenceImage />
+            <Canvas ref={canvasRef} />
+            <Functionalities
                 saving={httpInfo.isLoading}
                 shared={isShared}
                 onDownload={() => {
@@ -263,7 +261,6 @@ const CanvasPage = () => {
                   setOpenedShareModal(true);
                 }}
               />
-            </div>
           </Fragment>
         )}
         {!isOwner && httpInfo.isLoading && (

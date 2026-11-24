@@ -1,3 +1,4 @@
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faEraser,
   faEyeDropperEmpty,
@@ -9,104 +10,71 @@ import {
   faPaintbrush,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { canvasActions } from "../../../store/redux-store";
 import { Brushes } from "../../Canvas/CanvasOperations/canvas-utils";
-import Slider from "../../UI/Slider";
+import tool from "../Tool.module.css";
 import classes from "./ChangeMouse.module.css";
-import OtherOptions from "./OtherOptions";
+
+const TOOLS: { brush: Brushes; icon: IconDefinition; label: string }[] = [
+  { brush: Brushes.normal, icon: faPaintbrush, label: "Brush" },
+  { brush: Brushes.eraser, icon: faEraser, label: "Eraser" },
+  { brush: Brushes.fill, icon: faFillDrip, label: "Fill" },
+  { brush: Brushes.eye, icon: faEyeDropperEmpty, label: "Eyedropper" },
+  { brush: Brushes.zoomin, icon: faMagnifyingGlassPlus, label: "Zoom in" },
+  { brush: Brushes.zoomout, icon: faMagnifyingGlassMinus, label: "Zoom out" },
+];
 
 const ChangeMouse = () => {
   const color = useSelector((state: any) => state.canvas.color);
   const brushSize = useSelector((state: any) => state.canvas.size);
   const isPanning = useSelector((state: any) => state.canvas.panning);
   const brush = useSelector((state: any) => state.canvas.brush);
-  const zooming = brush === Brushes.zoomin || brush === Brushes.zoomout;
   const dispatchRedux = useDispatch();
+
   return (
-    <div className={`${classes["change-mouse-holder"]}`}>
-      <OtherOptions
-        label="Drawing tools"
-        className={`${!zooming ? classes.selected : ""}`}
-      >
-        <FontAwesomeIcon
+    <div className={classes.group}>
+      {TOOLS.map((t) => (
+        <button
+          key={t.label}
+          className={tool.tool}
+          aria-label={t.label}
+          title={t.label}
+          aria-pressed={!isPanning && brush === t.brush}
           onClick={() => {
-            dispatchRedux(canvasActions.changeBrush({ brush: Brushes.normal }));
+            if (isPanning) dispatchRedux(canvasActions.handlePanning());
+            dispatchRedux(canvasActions.changeBrush({ brush: t.brush }));
           }}
-          icon={faPaintbrush}
-          title="Brush"
-        />
-        <FontAwesomeIcon
-          onClick={() => {
-            dispatchRedux(canvasActions.changeBrush({ brush: Brushes.eraser}));
-          }}
-          icon={faEraser}
-          title="Eraser"
-        />
-        <FontAwesomeIcon
-          onClick={() => {
-            dispatchRedux(canvasActions.changeBrush({ brush: Brushes.fill }));
-          }}
-          icon={faFillDrip}
-          title="Fill"
-        />
-        <FontAwesomeIcon
-          onClick={() => {
-            dispatchRedux(canvasActions.changeBrush({ brush: Brushes.eye }));
-          }}
-          icon={faEyeDropperEmpty}
-          title="Eyedropper"
-        />
-      </OtherOptions>
-      <OtherOptions noAlternatives style={{ "--option-height": "25rem" }}>
-        <div
-          style={{
-            backgroundColor: color,
-            width: `calc(${Math.max(
-              0.05,
-              brushSize / 100
-            )} * (0.9 * (var(--container-height) - 1rem)))`,
-          }}
-          className={`${classes.size}`}
-        ></div>
-        <Slider
-          onChange={(newSize: number) => {
-            dispatchRedux(canvasActions.changeSize({ size: newSize }));
-          }}
-          className={`${classes.slider}`}
-          v
-          interval={25}
-          value={brushSize}
-        />
-      </OtherOptions>
-      <OtherOptions
-        label="Zoom tools"
-        className={`${zooming ? classes.selected : ""}`}
-      >
-        <FontAwesomeIcon
-          onClick={() => {
-            dispatchRedux(canvasActions.changeBrush({ brush: Brushes.zoomin }));
-          }}
-          icon={faMagnifyingGlassPlus}
-          title="Zoom in"
-        />
-        <FontAwesomeIcon
-          onClick={() => {
-            dispatchRedux(
-              canvasActions.changeBrush({ brush: Brushes.zoomout })
-            );
-          }}
-          icon={faMagnifyingGlassMinus}
-          title="Zoom out"
-        />
-      </OtherOptions>
-      <div
-        className={`${classes.option}`}
+        >
+          <FontAwesomeIcon icon={t.icon} />
+        </button>
+      ))}
+      <button
+        className={tool.tool}
+        aria-label="Move canvas"
+        title="Move canvas"
+        aria-pressed={isPanning}
         onClick={() => dispatchRedux(canvasActions.handlePanning())}
       >
-        <FontAwesomeIcon icon={!isPanning ? faHand : faHandBackFist} />
-      </div>
+        <FontAwesomeIcon icon={isPanning ? faHandBackFist : faHand} />
+      </button>
+      <label className={classes.size} title="Brush size">
+        <span
+          className={classes.dot}
+          style={{ backgroundColor: color, transform: `scale(${Math.max(0.25, brushSize / 100)})` }}
+        />
+        <input
+          type="range"
+          aria-label="Brush size"
+          min={0}
+          max={100}
+          step={25}
+          value={brushSize}
+          onChange={(e) =>
+            dispatchRedux(canvasActions.changeSize({ size: Math.max(1, Number(e.target.value)) }))
+          }
+        />
+      </label>
     </div>
   );
 };

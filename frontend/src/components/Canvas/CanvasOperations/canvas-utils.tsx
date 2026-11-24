@@ -76,10 +76,8 @@ export const adjustcanvasWindowSize = () => {
   if (window.innerWidth <= 50 * 16) {
     return window.innerWidth * 0.9;
   }
-  return Math.min(
-    window.innerHeight * 0.85,
-    window.innerWidth * 0.9 * 0.55 * 0.95
-  );
+  // Room left for the canvas once the navbar, name and toolbar below are placed
+  return Math.min(window.innerHeight - 230, window.innerWidth * 0.9);
 };
 
 export const drawGrid = (
