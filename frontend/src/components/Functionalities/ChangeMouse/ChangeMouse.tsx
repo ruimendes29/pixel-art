@@ -26,30 +26,37 @@ const ChangeMouse = () => {
   const dispatchRedux = useDispatch();
   return (
     <div className={`${classes["change-mouse-holder"]}`}>
-      <OtherOptions className={`${!zooming ? classes.selected : ""}`}>
+      <OtherOptions
+        label="Drawing tools"
+        className={`${!zooming ? classes.selected : ""}`}
+      >
         <FontAwesomeIcon
           onClick={() => {
             dispatchRedux(canvasActions.changeBrush({ brush: Brushes.normal }));
           }}
           icon={faPaintbrush}
+          title="Brush"
         />
         <FontAwesomeIcon
           onClick={() => {
             dispatchRedux(canvasActions.changeBrush({ brush: Brushes.eraser}));
           }}
           icon={faEraser}
+          title="Eraser"
         />
         <FontAwesomeIcon
           onClick={() => {
             dispatchRedux(canvasActions.changeBrush({ brush: Brushes.fill }));
           }}
           icon={faFillDrip}
+          title="Fill"
         />
         <FontAwesomeIcon
           onClick={() => {
             dispatchRedux(canvasActions.changeBrush({ brush: Brushes.eye }));
           }}
           icon={faEyeDropperEmpty}
+          title="Eyedropper"
         />
       </OtherOptions>
       <OtherOptions noAlternatives style={{ "--option-height": "25rem" }}>
@@ -73,12 +80,16 @@ const ChangeMouse = () => {
           value={brushSize}
         />
       </OtherOptions>
-      <OtherOptions className={`${zooming ? classes.selected : ""}`}>
+      <OtherOptions
+        label="Zoom tools"
+        className={`${zooming ? classes.selected : ""}`}
+      >
         <FontAwesomeIcon
           onClick={() => {
             dispatchRedux(canvasActions.changeBrush({ brush: Brushes.zoomin }));
           }}
           icon={faMagnifyingGlassPlus}
+          title="Zoom in"
         />
         <FontAwesomeIcon
           onClick={() => {
@@ -87,6 +98,7 @@ const ChangeMouse = () => {
             );
           }}
           icon={faMagnifyingGlassMinus}
+          title="Zoom out"
         />
       </OtherOptions>
       <div

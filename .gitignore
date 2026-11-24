@@ -5,3 +5,6 @@ uploads/
 *.pem
 .env*
 !backend/.env.example
+test-results/
+playwright-report/
+blob-report/

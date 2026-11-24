@@ -7,6 +7,8 @@ const OtherOptions = (props: any) => {
   return (
     <div
       style={props.style}
+      role="button"
+      aria-label={props.label}
       onClick={() => {
         setOpen((p) => !p);
       }}
@@ -17,6 +19,8 @@ const OtherOptions = (props: any) => {
           {props.children.map((el: any, index: number) => (
             <div
               className={`${classes.option}`}
+              role="button"
+              aria-label={el.props.title}
               key={index}
               onClick={() => {
                 setActiveChild(index);

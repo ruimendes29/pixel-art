@@ -401,6 +401,7 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
         ref={ref}
         className={`${classes.canvas}`}
         id="myCanvas"
+        aria-label="Drawing canvas"
         width={canvasWindowSize}
         height={canvasWindowSize}
       />

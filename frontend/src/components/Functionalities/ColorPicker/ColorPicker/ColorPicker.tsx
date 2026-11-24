@@ -34,6 +34,8 @@ const ColorPicker = () => {
         onClick={() => {
           dispatchRedux(canvasActions.changePickingColor());
         }}
+        role="button"
+        aria-label="Current colour"
         style={{ backgroundColor: color }}
         className={`${classes["current-color"]}`}
       ></div>
