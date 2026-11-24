@@ -147,3 +147,20 @@ test("a reference image is set behind the canvas and can be removed", async ({ p
   await page.getByRole("button", { name: "Remove reference image" }).click();
   await expect(page.getByRole("button", { name: "Add reference image" })).toBeVisible();
 });
+
+test("scrolling over the canvas doesn't scroll the page", async ({ page }) => {
+  // Short viewport so the page itself can scroll
+  await page.setViewportSize({ width: 390, height: 600 });
+  const canvasTop = async () => (await canvas(page).boundingBox())!.y;
+  const before = await canvasTop();
+
+  await canvas(page).hover();
+  await page.mouse.wheel(0, 300);
+  await page.waitForTimeout(200);
+  expect(await canvasTop()).toBe(before);
+
+  // Control: the same wheel next to the canvas does scroll, so the check above means something
+  await page.mouse.move(5, 300);
+  await page.mouse.wheel(0, 300);
+  await expect.poll(canvasTop).toBeLessThan(before);
+});

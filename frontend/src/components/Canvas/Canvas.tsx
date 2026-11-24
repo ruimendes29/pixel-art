@@ -188,6 +188,15 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
 
   window.addEventListener("resize", resize);
 
+  // Wheel and touchpad gestures over the canvas zoom it, so they must not also
+  // scroll or zoom the page. React's onWheel is passive and can't preventDefault.
+  useEffect(() => {
+    const canvas: HTMLCanvasElement = ref.current!;
+    const stop = (e: WheelEvent) => e.preventDefault();
+    canvas.addEventListener("wheel", stop, { passive: false });
+    return () => canvas.removeEventListener("wheel", stop);
+  }, [ref]);
+
   const dispatchPanned = (
     e: any,
     velocity: { x: number; y: number },

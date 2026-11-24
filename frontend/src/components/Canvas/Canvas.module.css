@@ -9,6 +9,8 @@
 
 .canvas {
   border: 1px solid black;
+  /* touch gestures on the canvas don't scroll or zoom the page */
+  touch-action: none;
 }
 
 .name{
