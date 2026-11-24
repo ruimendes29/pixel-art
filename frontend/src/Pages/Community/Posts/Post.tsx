@@ -41,27 +41,27 @@ const Post = (props: {
         headers: { "Content-Type": "image/*" },
         responseType: "blob",
       });
-      const { username } = await sendHttpRequest({
+      const user = await sendHttpRequest({
         url: `${COMMON_URL}/users/name/${props.authorId}`,
         headers: { "Content-Type": "application/json" },
       });
       setUserInfo({
         image: photoFromDB ? URL.createObjectURL(photoFromDB) : "",
-        name: username,
+        name: user?.username,
       });
     };
     const fetchLikeInfo = async () => {
-      const { likes } = await sendHttpRequest({
+      const likes = (await sendHttpRequest({
         url: `${COMMON_URL}/likes/number/${props.postId}`,
         headers: { "Content-Type": "application/json" },
-      });
+      }))?.likes ?? 0;
       if (localStorage.getItem("token")) {
-        const { liked } = await sendHttpRequest({
+        const liked = !!(await sendHttpRequest({
           url: `${COMMON_URL}/likes/liked/${
             props.postId
           }?key=${localStorage.getItem("token")}`,
           headers: { "Content-Type": "application/json" },
-        });
+        }))?.liked;
         setLikesInfo({ liked, numberOfLikes: likes });
       } else {
         setLikesInfo({ liked: false, numberOfLikes: likes });

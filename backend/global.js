@@ -4,9 +4,11 @@ var mysql = require("mysql2");
 var fs = require("fs");
 require("dotenv").config();
 
-// Hosted databases (e.g. Aiven) require SSL with their own CA certificate.
-// DB_SSL_CA can be the path to the .pem file or the certificate text itself
-// (line breaks may be written as \n, for env settings that only take one line).
+// Hosted databases require SSL. DB_SSL_CA is for hosts with their own CA
+// certificate: the path to the .pem file or the certificate text itself (line
+// breaks may be written as \n, for env settings that only take one line).
+// DB_SSL=true is for hosts with a public certificate (e.g. TiDB Cloud), checked
+// against Node's built-in CAs.
 const sslCa = process.env.DB_SSL_CA;
 const ssl = sslCa
   ? {
@@ -14,6 +16,8 @@ const ssl = sslCa
         ? sslCa.replace(/\\n/g, "\n")
         : fs.readFileSync(sslCa),
     }
+  : process.env.DB_SSL === "true"
+  ? { minVersion: "TLSv1.2", rejectUnauthorized: true }
   : undefined;
 
 const connection = mysql.createPool({

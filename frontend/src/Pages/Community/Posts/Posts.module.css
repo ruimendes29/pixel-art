@@ -12,3 +12,10 @@
     }
     
 }
+.error {
+    grid-column: 1 / -1;
+    margin: 2rem auto 0;
+    font-size: var(--fs-md);
+    color: var(--primary-color);
+    text-align: center;
+}

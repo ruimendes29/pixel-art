@@ -8,8 +8,8 @@ const Posts = (props: {
   community?: any;
   projects?: any;
 }) => {
-  const [, sendHttpRequest] = useHttp();
-  const [posts, setPosts] = useState([]);
+  const [httpInfo, sendHttpRequest] = useHttp();
+  const [posts, setPosts] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -20,14 +20,19 @@ const Posts = (props: {
         headers: { "Content-Type": "application/json" },
         method: "GET",
       });
-      console.log(projects);
-      setPosts(projects);
+      // A failed request resolves to undefined; keep the page up and show the error
+      setPosts(Array.isArray(projects) ? projects : []);
     };
     fetchProjects();
   }, [sendHttpRequest, props.selectedCategories]);
 
   return (
     <div className={`${classes["posts-holder"]}`}>
+      {httpInfo.error && (
+        <p className={classes.error}>
+          Could not load the community posts. Try again later.
+        </p>
+      )}
       {posts.map((el: any) => (
         <Post
           authorId={el.author}
