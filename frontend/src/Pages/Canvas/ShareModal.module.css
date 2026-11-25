@@ -1,0 +1,95 @@
+.modal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: min(90vw, 28rem);
+  /* the tag panel opens below the field and must not be cut off */
+  overflow: visible;
+  text-align: left;
+}
+
+.title {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.label {
+  margin-top: 0.5rem;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.textarea {
+  min-height: 6rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--outline);
+  border-radius: 0.5rem;
+  background-color: var(--surface);
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+}
+
+.textarea:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 1px;
+}
+
+/* "Create tag" footer inside the tags dropdown */
+.create {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  white-space: normal;
+}
+
+.row {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.row > input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--outline);
+  border-radius: 0.4rem;
+  background-color: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-sm);
+}
+
+.add {
+  flex-shrink: 0;
+  padding: 0.4rem 0.75rem;
+  border: none;
+  border-radius: 0.4rem;
+  background-color: var(--primary-color);
+  color: var(--on-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add:disabled {
+  background-color: var(--disabled-bg);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.hint {
+  margin: 0;
+  max-width: 18rem;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.error {
+  color: var(--error-color);
+}

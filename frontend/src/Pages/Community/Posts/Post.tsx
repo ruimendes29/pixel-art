@@ -112,7 +112,9 @@ const Post = (props: {
         onClick={() => setShowPost(true)}
         className={card.card}
       >
-        <img className={card.thumb} src={postImage} alt="" />
+        <span className={card.thumb}>
+          <img className={card.drawing} src={postImage} alt="" />
+        </span>
         <span className={card.name}>{props.postName}</span>
       </button>
       {showPost &&

@@ -11,7 +11,7 @@ router.get("/number/:projectId", async (req, res) => {
     res.status(200).jsonp({ likes: numberOfLikes });
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -23,7 +23,7 @@ router.get("/liked/:projectId", async (req, res) => {
     res.status(200).jsonp({ liked });
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -35,7 +35,7 @@ router.post("/like", async (req, res) => {
     res.status(200).jsonp({ liked });
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -48,7 +48,7 @@ router.delete("/:projectId", async(req,res) => {
     }
     catch (error) {
         console.error(error);
-        res.status(error.status || 401).jsonp({ error: error.message });
+        res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
       }
 })
 

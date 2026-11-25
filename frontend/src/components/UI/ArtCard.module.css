@@ -44,6 +44,17 @@
   color: var(--primary-color);
 }
 
+/* The drawing inside .thumb. Its outline follows the drawing's shape (its
+   transparency), so white pixels show on the light checkerboard. The
+   checkerboard stays on .thumb: a filter here would outline it too. */
+.drawing {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 1px var(--sprite-outline)) drop-shadow(0 0 1px var(--sprite-outline));
+}
+
 .name {
   margin: 0;
   padding: 0 0.25rem 0.25rem;

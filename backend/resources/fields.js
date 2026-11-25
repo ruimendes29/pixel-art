@@ -4,10 +4,13 @@
 // straight to the API is held to exactly what the forms check.
 const spec = require("../../frontend/src/fields/fields.json");
 
+// `field` (optional) is the input key the message belongs to, so the form can
+// show it under that input
 class ValidationError extends Error {
-  constructor(message) {
+  constructor(message, field, status = 400) {
     super(message);
-    this.status = 400;
+    this.status = status;
+    this.field = field;
   }
 }
 
@@ -82,10 +85,14 @@ const assertFields = (values) => {
   const errors = [];
   for (const [key, raw] of Object.entries(values)) {
     const { value, error } = validateField(key, raw);
-    if (error) errors.push(error);
+    if (error) errors.push({ key, error });
     cleaned[key] = value;
   }
-  if (errors.length) throw new ValidationError(errors.join(". "));
+  if (errors.length) {
+    // one problem: say which input it belongs to; several: the form shows them together
+    const field = errors.length === 1 ? errors[0].key : undefined;
+    throw new ValidationError(errors.map((e) => e.error).join(". "), field);
+  }
   return cleaned;
 };
 

@@ -6,6 +6,7 @@ const {
   parseSearchQuery,
   escapeLike,
 } = require("../../resources/tags");
+const { resolveTags } = require("../tag/tag");
 require("dotenv").config();
 
 const createProject = async (
@@ -133,7 +134,7 @@ const getShared = async (tagsQuery, searchQuery) => {
 
 const shareProject = async (token, projectId, rawTags, description) => {
   const user = await auth.verify(token);
-  const tags = normalizeTags(rawTags ?? []);
+  const tags = await resolveTags(normalizeTags(rawTags ?? []));
   let sql = `UPDATE Project SET shared=1,description=? WHERE id=? and author=?`;
   const updated = await sqlController.queryDataBase(sql, [
     description,

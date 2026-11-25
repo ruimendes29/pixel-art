@@ -30,8 +30,9 @@
     "groupName": { "type": "text", "label": "Group name", "required": true, "maxLength": 100 },
     "description": { "type": "textarea", "label": "Description", "required": false, "maxLength": 1000 },
     "tag": { "type": "text", "label": "Tag", "required": false, "maxLength": 50 },
+    "newTag": { "type": "text", "label": "New tag", "required": true, "maxLength": 50 },
     "search": { "type": "text", "label": "Search", "required": false, "maxLength": 100 },
     "id": { "type": "int", "label": "Id", "required": true, "min": 1, "max": 2147483647 }
   },
-  "limits": { "maxTags": 20 }
+  "limits": { "maxTags": 20, "maxTagsCreatedPerUser": 10 }
 }

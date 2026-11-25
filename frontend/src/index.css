@@ -80,6 +80,8 @@
   --grid-line: #000000;
   /* higher than dark: at 0.3 on the white canvas the image washes out */
   --reference-opacity: 0.6;
+  /* thin outline around drawings, so white pixels show on light backgrounds */
+  --sprite-outline: rgba(31, 59, 59, 0.85);
 }
 
 /* Dark theme map */
@@ -117,6 +119,7 @@
   --canvas-border: #4d6a6a;
   --grid-line: #4d6a6a;
   --reference-opacity: 0.3;
+  --sprite-outline: rgba(220, 235, 235, 0.6);
 }
 
 body {

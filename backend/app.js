@@ -9,6 +9,7 @@ const userRouter = require("./routers/userRouter/index");
 const artRouter = require("./routers/artRouter/index");
 const groupRouter = require("./routers/groupRouter/index");
 const likesRouter = require("./routers/likesRouter/index");
+const tagRouter = require("./routers/tagRouter/index");
 
 const app = express();
 
@@ -25,5 +26,6 @@ app.use("/api/users", userRouter);
 app.use("/api/art", artRouter);
 app.use("/api/groups", groupRouter);
 app.use("/api/likes", likesRouter);
+app.use("/api/tags", tagRouter);
 
 module.exports = app;

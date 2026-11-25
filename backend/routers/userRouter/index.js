@@ -31,7 +31,7 @@ router.get("/photo", async (req, res) => {
     res.type(photo.mime).send(photo.data);
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -43,7 +43,7 @@ router.get("/photo/:id", async (req, res) => {
     res.type(photo.mime).send(photo.data);
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -54,7 +54,7 @@ router.get("/name", async (req, res) => {
     res.status(200).jsonp({ username });
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 router.get("/name/:id", async (req, res) => {
@@ -64,7 +64,7 @@ router.get("/name/:id", async (req, res) => {
     res.status(200).jsonp({ username });
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -76,7 +76,7 @@ router.get("/id", async (req, res) => {
     res.status(200).jsonp({ id: userId });
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -94,7 +94,7 @@ router.post("/login", async (req, res) => {
     res.status(200).jsonp(loginInfo);
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -110,7 +110,7 @@ router.post("/add-user", upload.single("image"), async (req, res) => {
     res.status(200).send({});
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -121,7 +121,7 @@ router.post("/add-group/:groupName", async (req, res) => {
     res.status(200).send({});
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -134,7 +134,7 @@ router.delete("/:name/:email/:password", async (req, res) => {
     res.status(200).send();
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 

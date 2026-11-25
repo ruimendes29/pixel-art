@@ -37,12 +37,12 @@ const loginUser = async (username, password) => {
     username,
   ]);
   if (userInfo.length === 0) {
-    throw Error("Username does not exist!");
+    throw new ValidationError("No account has this username", "username", 401);
   }
   const hashedPassword = userInfo[0].password;
   const passwordIsRight = bcrypt.compareSync(password, hashedPassword);
   if (!passwordIsRight) {
-    throw Error("Credentials do not match!");
+    throw new ValidationError("Wrong password", "loginPassword", 401);
   }
   return {
     token: await auth.sign({ username, id: userInfo[0].id }),
@@ -67,8 +67,8 @@ const isEmailUsed = async (email) => {
 // (resources/fields.js) by the router
 const addUser = async (name, email, password, photo) => {
   if (!photo.mimetype.startsWith("image/")) throw new ValidationError("The profile picture must be an image");
-  if (await isUsernameUsed(name)) throw new ValidationError("Username is already in use");
-  if (await isEmailUsed(email)) throw new ValidationError("Email is already in use");
+  if (await isUsernameUsed(name)) throw new ValidationError("Username is already in use", "username");
+  if (await isEmailUsed(email)) throw new ValidationError("Email is already in use", "email");
   const hashedPassword = await bcrypt.hash(password, 10);
   // firstly store the photo in the database to get its id
   const addImage = `INSERT INTO Image (data,mime) VALUES (?,?)`;

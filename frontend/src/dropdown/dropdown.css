@@ -145,7 +145,82 @@
   transform: rotate(180deg);
 }
 
+/* MultiSelect: checkbox at the start of each row, count on the trigger,
+   optional footer under the list */
+/* only the list scrolls, so the footer stays in view */
+.dd__panel--multi {
+  overflow: hidden;
+}
+
+.dd__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.dd__box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  border: 1.5px solid var(--dd-muted);
+  border-radius: 0.25rem;
+  font-size: 0.65rem;
+  color: var(--dd-bg);
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.dd__item[aria-selected="true"] .dd__box {
+  border-color: var(--dd-accent);
+  background-color: var(--dd-accent);
+}
+
+/* in a multi-select the box shows the choice: the text stays normal */
+.dd__list .dd__item[aria-selected="true"] {
+  color: inherit;
+  font-weight: 500;
+}
+
+.dd__count {
+  min-width: 1.25rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background-color: var(--dd-accent);
+  color: var(--dd-bg);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  text-align: center;
+}
+
+.dd__select > .dd__chevron {
+  margin-left: auto;
+}
+
+.dd__empty {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  color: var(--dd-muted);
+  font-size: var(--fs-sm, 0.875rem);
+}
+
+.dd__footer {
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.35rem 0.15rem;
+  border-top: 1px solid var(--dd-border);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .dd__box {
+    transition: none;
+  }
   .dd__panel {
     animation: none;
   }

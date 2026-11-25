@@ -50,7 +50,8 @@ const useHttp = () => {
 
         if (!rawResponse.ok) {
           const content = await rawResponse.json();
-          throw new Error(content.error);
+          // field: the input key the message belongs to, when the API says
+          throw Object.assign(new Error(content.error), { field: content.field });
         }
         let content;
         if (

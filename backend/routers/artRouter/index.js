@@ -34,7 +34,7 @@ router.post("/share-project", async (req, res) => {
   } catch (error) {
     //fs.unlinkSync(req.file.path);
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -63,7 +63,7 @@ router.post("/add-project", async (req, res) => {
     //fs.unlinkSync(req.file.path);
     console.error(error);
 
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -82,7 +82,7 @@ router.post("/add-image", upload.single("image"), async (req, res) => {
     //fs.unlinkSync(req.file.path);
     console.error(error);
 
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -95,7 +95,7 @@ router.get("/project-owner/:id", async (req, res) => {
     res.status(200).jsonp({ author });
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -106,7 +106,7 @@ router.get("/project-image/:id", async (req, res) => {
     res.type(image.mime).send(image.data);
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -117,7 +117,7 @@ router.get("/project-canvas/:id", async (req, res) => {
     res.status(200).jsonp({ ...canvas });
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -129,7 +129,7 @@ router.get("/projects", async (req, res) => {
     res.status(200).jsonp(projects);
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -140,7 +140,7 @@ router.get("/is-shared/:id", async (req, res) => {
     res.status(200).jsonp({ shared: isShared });
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 
@@ -151,7 +151,7 @@ router.get("/shared-projects", async (req, res) => {
     res.status(200).jsonp(projects);
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 

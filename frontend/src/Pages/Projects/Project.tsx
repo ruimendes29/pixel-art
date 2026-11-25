@@ -29,7 +29,9 @@ const Project = (props: { id: number; name: string; onClick: Function }) => {
           <FontAwesomeIcon className="fa-spin" icon={faCircleNotch} />
         </span>
       ) : (
-        <img className={card.thumb} src={image} alt="" />
+        <span className={card.thumb}>
+          <img className={card.drawing} src={image} alt="" />
+        </span>
       )}
       <span className={card.name}>{props.name}</span>
     </button>

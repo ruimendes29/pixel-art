@@ -39,6 +39,14 @@ CREATE TABLE IF NOT EXISTS Project (
   FOREIGN KEY (image) REFERENCES Image(id) ON DELETE SET NULL
 );
 
+-- Tags anyone can pick when sharing or filtering. createdBy is NULL for the
+-- built-in ones; each user can create a limited number (see fields.json limits).
+CREATE TABLE IF NOT EXISTS TagName (
+  name VARCHAR(50) NOT NULL PRIMARY KEY,
+  createdBy INT,
+  FOREIGN KEY (createdBy) REFERENCES User(id) ON DELETE SET NULL
+);
+
 CREATE TABLE IF NOT EXISTS Tag (
   projectId INT NOT NULL,
   name VARCHAR(50) NOT NULL,

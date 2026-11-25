@@ -24,8 +24,7 @@ import ReferenceImage from "../../components/Functionalities/ReferenceImage";
 import useHttp, { COMMON_URL } from "../../hooks/use-http";
 import { canvasActions } from "../../store/redux-store";
 import { gridToSvg } from "../../components/Canvas/CanvasOperations/grid-to-svg";
-import FilterModal from "../Community/FilterModal";
-import { toggleTag } from "../Community/tags";
+import ShareModal from "./ShareModal";
 import classes from "./CanvasPage.module.css";
 
 function dataURItoBlob(dataURI: string) {
@@ -302,16 +301,11 @@ const CanvasPage = () => {
         )}
       </div>
       {openedShareModal && (
-        <FilterModal
-          toShare
-          onShare={(description: string) => {
-            handleShareCanvas(description);
-          }}
-          onClose={() => setOpenedShareModal(false)}
+        <ShareModal
           selectedTags={tags}
-          onSelectTag={(tag: string) => {
-            setTags((oldTags: string[]) => toggleTag(oldTags, tag));
-          }}
+          onChange={setTags}
+          onShare={handleShareCanvas}
+          onClose={() => setOpenedShareModal(false)}
         />
       )}
     </Fragment>

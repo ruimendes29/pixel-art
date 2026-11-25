@@ -10,7 +10,7 @@ router.get("/own", async (req, res) => {
     res.status(200).jsonp(groups);
   } catch (error) {
     console.error(error);
-    res.status(error.status || 401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message, field: error.field });
   }
 });
 

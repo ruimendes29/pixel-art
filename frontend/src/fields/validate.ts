@@ -28,6 +28,7 @@ const FIELDS = spec.fields as Record<string, Field>;
 const TYPES = spec.types as Record<string, FieldType>;
 
 export const MAX_TAGS = spec.limits.maxTags;
+export const MAX_TAGS_CREATED_PER_USER = spec.limits.maxTagsCreatedPerUser;
 
 // Every field must have what its type requires (e.g. a textarea a maxLength)
 export const checkSpec = () => {

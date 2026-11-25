@@ -15,6 +15,11 @@ const Register = () => {
   const [httpInfo, sendHttp] = useHttp();
   const passwordInput = useField("password");
   const emailInput = useField("email");
+  // The API's error under the input it is about; errors with no field go under Email
+  const serverError = (field: string) =>
+    httpInfo.error && (httpInfo.error.field ?? "email") === field
+      ? httpInfo.error.message
+      : undefined;
 
   const navigate = useNavigate();
 
@@ -59,32 +64,33 @@ const Register = () => {
       <div className={`${classes.inputs}`}>
         <Input
           className={`${classes.ipt}`}
-          invalid={nameInput.isInputInvalid}
+          invalid={nameInput.isInputInvalid || !!serverError("username")}
           onChange={nameInput.valueChanged}
           value={nameInput.enteredValue}
           onBlur={nameInput.touchedHandler}
           name={nameInput.label}
           maxLength={nameInput.maxLength}
-          error={nameInput.error}
+          error={serverError("username") ?? nameInput.error}
         />
         <Input
           className={`${classes.ipt}`}
-          invalid={passwordInput.isInputInvalid}
+          invalid={passwordInput.isInputInvalid || !!serverError("password")}
           onChange={passwordInput.valueChanged}
           value={passwordInput.enteredValue}
           onBlur={passwordInput.touchedHandler}
           name={passwordInput.label}
           maxLength={passwordInput.maxLength}
           type="password"
+          error={serverError("password")}
         />
         <PasswordMeter value={passwordInput.enteredValue} />
         <Input
           className={`${classes.ipt}`}
-          invalid={emailInput.isInputInvalid || httpInfo.error}
+          invalid={emailInput.isInputInvalid || !!serverError("email")}
           onChange={emailInput.valueChanged}
           value={emailInput.enteredValue}
           onBlur={emailInput.touchedHandler}
-          error={httpInfo.error ? httpInfo.error.message : emailInput.error}
+          error={serverError("email") ?? emailInput.error}
           name={emailInput.label}
           maxLength={emailInput.maxLength}
           type="email"

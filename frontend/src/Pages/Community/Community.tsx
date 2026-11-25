@@ -3,16 +3,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { Fragment, useEffect, useState } from "react";
 import Chip from "../../components/UI/Chip";
 import classes from "./Community.module.css";
-import FilterModal from "./FilterModal";
+import MultiSelect from "../../dropdown/MultiSelect";
 import Posts from "./Posts/Posts";
 import SearchBar from "./SearchBar";
-import { toggleTag } from "./tags";
+import { toggleTag, useTagCatalog } from "./tags";
 
 export const SEARCH_DEBOUNCE_MS = 150;
 
 const Community = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [showModal, setShowModal] = useState(false);
+  const catalog = useTagCatalog();
 
   // What is typed, and what is searched: the search waits 150 ms after the last keystroke
   const [searchText, setSearchText] = useState("");
@@ -48,31 +48,20 @@ const Community = () => {
                 ))}
               </ul>
             )}
-            <button
-              className={classes["filter-button"]}
-              aria-label="Filter by tags"
-              title="Filter by tags"
-              aria-expanded={showModal}
-              onClick={() => setShowModal((open) => !open)}
-            >
-              <FontAwesomeIcon icon={faFilter} />
-              {selectedTags.length > 0 && (
-                <span className={classes.count} aria-hidden>
-                  {selectedTags.length}
-                </span>
-              )}
-            </button>
+            {/* only tags that exist can be picked: new ones are created when sharing */}
+            <MultiSelect
+              label="Tags"
+              icon={<FontAwesomeIcon icon={faFilter} />}
+              placement="bottom-end"
+              options={catalog.tags.map((t) => ({ value: t, label: t }))}
+              values={selectedTags}
+              onChange={setSelectedTags}
+              emptyText="No tags yet"
+            />
           </div>
         </div>
         <Posts selectedCategories={selectedTags} search={search} />
       </div>
-      {showModal && (
-        <FilterModal
-          onSelectTag={handleSelectTag}
-          selectedTags={selectedTags}
-          onClose={() => setShowModal(false)}
-        />
-      )}
     </Fragment>
   );
 };

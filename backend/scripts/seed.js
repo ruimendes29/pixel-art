@@ -16,6 +16,7 @@ const { connection } = require("../global");
 const { queryDataBase: q } = require("../resources/db");
 const { assertFields } = require("../resources/fields");
 const { normalizeTags } = require("../resources/tags");
+const PRESET_TAGS = require("../resources/preset-tags");
 
 // ---------------------------------------------------------------- PNG drawing
 
@@ -122,6 +123,12 @@ const LIKES = {
   "carla.draws": ["Mushroom", "Sword", "Purple potion", "Little house"],
 };
 
+// Tags users added to the shared catalog (the rest are PRESET_TAGS)
+const CREATED_TAGS = {
+  bruno8bit: ["Fantasy"],
+  "carla.draws": ["Plants", "Desert"],
+};
+
 // Easy to type, and passes the password rules (upper, lower, number, symbol, 8+)
 const WORDS = ["Cactus", "Pixel", "Mango", "Comet", "Tiger", "Maple", "Pepper", "Ocean", "Rocket", "Violet"];
 const randomPassword = () =>
@@ -129,7 +136,7 @@ const randomPassword = () =>
 
 // ---------------------------------------------------------------- run
 
-const TABLES = ["Likes", "Tag", "Project", "Grupo", "User", "Image"]; // children first
+const TABLES = ["Likes", "Tag", "TagName", "Project", "Grupo", "User", "Image"]; // children first
 
 const recreateTables = async () => {
   for (const table of TABLES) await q(`DROP TABLE IF EXISTS ${table}`);
@@ -154,6 +161,10 @@ const main = async () => {
   PROJECTS.forEach((p) => {
     assertFields({ projectName: p.name, canvasSize: p.size, description: p.description });
     if (p.group) assertFields({ groupName: p.group });
+    for (const tag of p.tags || []) {
+      const known = PRESET_TAGS.concat(...Object.values(CREATED_TAGS));
+      if (!known.includes(tag)) throw new Error(`Project "${p.name}" uses "${tag}", which is not in the tag catalog`);
+    }
     normalizeTags(p.tags || []);
   });
 
@@ -167,6 +178,14 @@ const main = async () => {
     userIds[u.username] = (
       await q(`INSERT INTO User (username,email,password,photo) VALUES (?,?,?,?)`, [u.username, u.email, hash, photo])
     ).insertId;
+  }
+
+  for (const tag of PRESET_TAGS) await q(`INSERT INTO TagName (name) VALUES (?)`, [tag]);
+  for (const [username, tags] of Object.entries(CREATED_TAGS)) {
+    for (const tag of tags) {
+      assertFields({ newTag: tag });
+      await q(`INSERT INTO TagName (name,createdBy) VALUES (?,?)`, [tag, userIds[username]]);
+    }
   }
 
   const groupIds = {};

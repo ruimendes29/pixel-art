@@ -10,6 +10,7 @@
     width: min(90%,85vh);
     align-self: center;
     image-rendering: pixelated;
+    filter: drop-shadow(0 0 1px var(--sprite-outline)) drop-shadow(0 0 1px var(--sprite-outline));
 }
 .left{
     display: flex;

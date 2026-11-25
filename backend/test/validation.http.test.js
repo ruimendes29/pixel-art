@@ -10,7 +10,11 @@ before(async () => {
   await new Promise((resolve) => server.once("listening", resolve));
   base = `http://localhost:${server.address().port}/api`;
 });
-after(() => server.close());
+// the DB pool would keep the process alive after the login test
+after(() => {
+  server.close();
+  require("../global").connection.end();
+});
 
 const post = async (path, body) => {
   const res = await fetch(`${base}${path}`, {
@@ -60,4 +64,25 @@ test("an id that is not a number is refused", async () => {
   const { status, error } = await post("/likes/like", { token: "x", projectId: "1 OR 1=1" });
   assert.equal(status, 400);
   assert.equal(error, "Id must be a number");
+});
+
+test("a single problem says which input it belongs to", async () => {
+  const res = await fetch(`${base}/art/add-project`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: "x", name: "Cat", size: 5000 }),
+  });
+  assert.equal((await res.json()).field, "canvasSize");
+});
+
+// Needs a database (a username that surely doesn't exist)
+const noDb = !process.env.DB_HOST && "set DB_HOST to run the database tests";
+test("an unknown username is reported on the username input", { skip: noDb }, async () => {
+  const res = await fetch(`${base}/users/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: `nobody-${Date.now()}`, password: "x" }),
+  });
+  assert.equal(res.status, 401);
+  assert.deepEqual(await res.json(), { error: "No account has this username", field: "username" });
 });

@@ -54,6 +54,11 @@ before(async () => {
     const project = await db.queryDataBase("INSERT INTO Project (name,author,size) VALUES (?,?,16)", [key, userId]);
     ids[key] = project.insertId;
   }
+  // Sharing only accepts tags from the catalog: make sure the ones used here exist
+  for (const tag of ["Retro games", "Cats", "Dogs"]) {
+    const found = await db.queryDataBase("SELECT 1 FROM TagName WHERE LOWER(name)=LOWER(?)", [tag]);
+    if (!found.length) await db.queryDataBase("INSERT INTO TagName (name) VALUES (?)", [tag]);
+  }
   // A tag on a project that is never shared must not make it show up
   await db.queryDataBase("INSERT INTO Tag (projectId,name) VALUES (?,?)", [ids.unshared, "Cats"]);
 
@@ -63,7 +68,10 @@ before(async () => {
 
 after(async () => {
   if (skip) return;
-  if (userId) await db.queryDataBase("DELETE FROM User WHERE id=?", [userId]); // cascades to projects and tags
+  if (userId) {
+    await db.queryDataBase("DELETE FROM TagName WHERE createdBy=?", [userId]);
+    await db.queryDataBase("DELETE FROM User WHERE id=?", [userId]); // cascades to projects and tags
+  }
   server?.close();
   await connection.promise().end();
 });
@@ -125,4 +133,31 @@ test("search treats % and _ as plain characters", { skip }, async () => {
 test("search and tags combine", { skip }, async () => {
   assert.deepEqual(await filter(["Cats"], "retro"), [ids.retroCats]);
   assert.deepEqual(await filter(["Dogs"], "retro"), []);
+});
+
+const createTag = (name) => api("/tags", { method: "POST", body: JSON.stringify({ token, name }) });
+
+test("sharing with a tag that is not in the catalog is refused", { skip }, async () => {
+  const res = await share(ids.invalid, ["Cats", "Not a real tag"]);
+  assert.equal(res.status, 400);
+  assert.deepEqual(res.body, { error: "Unknown tag: Not a real tag", field: "tags" });
+});
+
+test("users create tags for everyone, at most 10 each", { skip }, async () => {
+  const prefix = `t${Date.now()}`;
+  const first = await createTag(`  ${prefix}   one `);
+  assert.deepEqual(first, { status: 200, body: { name: `${prefix} one` } });
+
+  const again = await createTag(`${prefix} ONE`);
+  assert.equal(again.status, 400);
+  assert.equal(again.body.error, `The tag "${prefix} one" already exists`);
+
+  for (let i = 2; i <= 10; i++) assert.equal((await createTag(`${prefix} ${i}`)).status, 200);
+  const list = await api(`/tags?key=${token}`);
+  assert.equal(list.body.createdByMe, 10);
+  assert.ok(list.body.tags.includes(`${prefix} one`));
+
+  const eleventh = await createTag(`${prefix} 11`);
+  assert.equal(eleventh.status, 400);
+  assert.deepEqual(eleventh.body, { error: "You can create at most 10 tags", field: "newTag" });
 });
