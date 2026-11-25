@@ -81,7 +81,7 @@
   padding: 0 0.3rem;
   box-sizing: border-box;
   border-radius: 0.625rem;
-  background-color: var(--on-primary);
+  background-color: var(--surface);
   color: var(--primary-color);
   font-size: var(--fs-xs);
   font-weight: 700;

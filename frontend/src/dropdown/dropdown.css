@@ -1,0 +1,157 @@
+/* Shared look for every dropdown (menus and selects). Self-contained so the
+   folder can be copied to another project: each colour reads the app's own
+   variable first and falls back to a neutral value.
+   Change the look per project by overriding the --dd-* variables. */
+:root {
+  --dd-bg: var(--surface, #ffffff);
+  --dd-text: var(--text, #1f2933);
+  --dd-muted: var(--text-faint, #9aa5b1);
+  --dd-accent: var(--primary-color, #3bbfbf);
+  --dd-hover: var(--primary-tint-strong, rgba(59, 191, 191, 0.12));
+  --dd-active: var(--primary-tint, rgba(59, 191, 191, 0.2));
+  --dd-border: var(--outline, rgba(0, 0, 0, 0.08));
+  --dd-shadow: var(--shadow-soft, rgba(0, 0, 0, 0.12));
+  --dd-radius: 0.75rem;
+  --dd-item-radius: 0.5rem;
+}
+
+.dd {
+  position: relative;
+  display: inline-flex;
+}
+
+/* The panel: rounded, a hairline border and a light two-layer shadow so it
+   stands out from the page in both themes (shadows alone vanish on dark). */
+.dd__panel {
+  position: absolute;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: max(100%, 11rem);
+  max-height: min(20rem, 60vh);
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  box-sizing: border-box;
+  border: 1px solid var(--dd-border);
+  border-radius: var(--dd-radius);
+  background-color: var(--dd-bg);
+  color: var(--dd-text);
+  box-shadow: 0 1px 2px var(--dd-shadow), 0 8px 24px var(--dd-shadow);
+  animation: dd-in 0.12s ease-out;
+}
+
+.dd__panel--bottom-start { top: calc(100% + 0.4rem); left: 0; transform-origin: top left; }
+.dd__panel--bottom-end { top: calc(100% + 0.4rem); right: 0; transform-origin: top right; }
+.dd__panel--top-start { bottom: calc(100% + 0.4rem); left: 0; transform-origin: bottom left; }
+.dd__panel--top-end { bottom: calc(100% + 0.4rem); right: 0; transform-origin: bottom right; }
+
+@keyframes dd-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* One row: icon, label, optional check mark for the selected option */
+.dd__item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  border-radius: var(--dd-item-radius);
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--fs-sm, 0.875rem);
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.dd__item > svg {
+  flex-shrink: 0;
+  color: var(--dd-accent);
+}
+
+.dd__item:hover:not([aria-disabled="true"]),
+.dd__item:focus-visible {
+  background-color: var(--dd-hover);
+  outline: none;
+}
+
+.dd__item:active:not([aria-disabled="true"]) {
+  background-color: var(--dd-active);
+}
+
+.dd__item[aria-selected="true"] {
+  color: var(--dd-accent);
+  font-weight: 600;
+}
+
+.dd__item[aria-disabled="true"] {
+  color: var(--dd-muted);
+  cursor: default;
+}
+
+.dd__item[aria-disabled="true"] > svg {
+  color: inherit;
+}
+
+.dd__check {
+  margin-left: auto;
+}
+
+/* Select trigger: looks like a field, with a chevron that flips when open */
+.dd__select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--dd-border);
+  border-radius: var(--dd-item-radius);
+  background-color: var(--dd-bg);
+  color: var(--dd-text);
+  font: inherit;
+  font-size: var(--fs-sm, 0.875rem);
+  cursor: pointer;
+  transition: border-color 0.12s ease;
+}
+
+.dd__select:hover,
+.dd__select[aria-expanded="true"] {
+  border-color: var(--dd-accent);
+}
+
+.dd__select:focus-visible {
+  outline: 2px solid var(--dd-accent);
+  outline-offset: 1px;
+}
+
+.dd__chevron {
+  color: var(--dd-accent);
+  transition: transform 0.15s ease;
+}
+
+.dd__select[aria-expanded="true"] .dd__chevron {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dd__panel {
+    animation: none;
+  }
+  .dd__item,
+  .dd__select,
+  .dd__chevron {
+    transition: none;
+  }
+}

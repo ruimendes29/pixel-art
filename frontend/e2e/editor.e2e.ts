@@ -193,9 +193,49 @@ test("the cursor is a hand while panning, also when holding space", async ({ pag
 test("the theme follows the system's dark mode", async ({ page }) => {
   const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
   await page.emulateMedia({ colorScheme: "light" });
-  expect(await bg()).toBe("rgb(255, 255, 255)");
+  await expect.poll(bg).toBe("rgb(255, 255, 255)");
   await page.emulateMedia({ colorScheme: "dark" });
-  expect(await bg()).toBe("rgb(15, 26, 26)");
+  await expect.poll(bg).toBe("rgb(15, 26, 26)");
+});
+
+test("keyboard shortcuts switch tools, but not while typing", async ({ page }) => {
+  await page.keyboard.press("e");
+  await expect(page.getByRole("button", { name: "Eraser", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await page.keyboard.press("h");
+  await expect(page.getByRole("button", { name: "Move canvas" })).toHaveAttribute("aria-pressed", "true");
+  await page.keyboard.press("b");
+  await expect(page.getByRole("button", { name: "Brush", exact: true })).toHaveAttribute("aria-pressed", "true");
+
+  await page.getByRole("button", { name: "Current colour" }).click();
+  await page.getByLabel("hex").press("e");
+  await expect(page.getByRole("button", { name: "Brush", exact: true })).toHaveAttribute("aria-pressed", "true");
+});
+
+test("the shortcuts sidebar sits left of the canvas and remembers being collapsed", async ({ page }) => {
+  const tab = page.getByRole("button", { name: "Keyboard shortcuts" });
+  const list = page.locator("#shortcuts-list");
+  const box = (await canvas(page).boundingBox())!;
+
+  await expect(list).toBeVisible();
+  await expect(list).toContainText("Eraser");
+  const listBox = (await list.boundingBox())!;
+  expect(listBox.x + listBox.width).toBeLessThanOrEqual(box.x);
+
+  await tab.hover();
+  await expect(page.getByRole("tooltip")).toContainText("Hide the keyboard shortcuts");
+
+  await tab.click();
+  await expect(list).toBeHidden();
+  await expect(tab).toHaveAttribute("aria-expanded", "false");
+  const tabBox = (await tab.boundingBox())!;
+  expect(tabBox.x + tabBox.width).toBeLessThanOrEqual(box.x);
+
+  await page.mouse.move(0, 0);
+  await tab.hover();
+  await expect(page.getByRole("tooltip")).toContainText("keys for the tools");
+
+  // Still collapsed on the next visit to the editor
+  expect(await page.evaluate(() => localStorage.getItem("shortcuts-panel-open"))).toBe("false");
 });
 
 test("scrolling over the canvas doesn't scroll the page", async ({ page }) => {

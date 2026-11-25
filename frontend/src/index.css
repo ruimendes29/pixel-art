@@ -13,6 +13,9 @@
   --fs-lg: 1.375rem;
   --fs-xl: clamp(1.5rem, 1.1rem + 1.6vw, 2.125rem);
 
+  /* Widest a form column gets, so inputs don't stretch across big screens */
+  --form-width: 28rem;
+
   /* Password strength steps: 0 to 5 requirements met */
   --strength-1: #ff5454;
   --strength-2: #ff8a3d;
@@ -23,8 +26,10 @@
 
 /* ---------------------------------------------------------------------------
    Colour themes. Two maps with the same variable names: the light map is the
-   default and the dark map replaces it when the operating system is set to
-   dark mode. Components only use these names, never raw colours.
+   default and the dark map replaces it when <html data-theme="dark">.
+   src/theme/theme.ts sets that attribute from the user's choice (System,
+   Light or Dark, saved in localStorage), following the operating system by
+   default. Components only use these names, never raw colours.
    --------------------------------------------------------------------------- */
 
 /* Light theme map */
@@ -64,41 +69,39 @@
 }
 
 /* Dark theme map */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
+:root[data-theme="dark"] {
+  color-scheme: dark;
 
-    --bg: #0f1a1a;
-    --surface: #182727;
-    --text: #dcebeb;
-    --text-strong: #c4d4d4;
-    --text-muted: #93abab;
-    --text-faint: #6b8383;
-    --on-primary: #0f1a1a;
+  --bg: #0f1a1a;
+  --surface: #182727;
+  --text: #dcebeb;
+  --text-strong: #c4d4d4;
+  --text-muted: #93abab;
+  --text-faint: #6b8383;
+  --on-primary: #0f1a1a;
 
-    --primary-tint: rgba(59, 191, 191, 0.12);
-    --primary-tint-strong: rgba(59, 191, 191, 0.2);
-    --primary-line: rgba(59, 191, 191, 0.35);
+  --primary-tint: rgba(59, 191, 191, 0.12);
+  --primary-tint-strong: rgba(59, 191, 191, 0.2);
+  --primary-line: rgba(59, 191, 191, 0.35);
 
-    --outline: rgba(220, 235, 235, 0.3);
-    --shadow-soft: rgba(0, 0, 0, 0.35);
-    --shadow: rgba(0, 0, 0, 0.4);
-    --shadow-strong: rgba(0, 0, 0, 0.5);
-    --shadow-neutral: rgba(0, 0, 0, 0.5);
-    --overlay: rgba(0, 0, 0, 0.6);
-    --overlay-strong: rgba(0, 0, 0, 0.7);
+  --outline: rgba(220, 235, 235, 0.3);
+  --shadow-soft: rgba(0, 0, 0, 0.35);
+  --shadow: rgba(0, 0, 0, 0.4);
+  --shadow-strong: rgba(0, 0, 0, 0.5);
+  --shadow-neutral: rgba(0, 0, 0, 0.5);
+  --overlay: rgba(0, 0, 0, 0.6);
+  --overlay-strong: rgba(0, 0, 0, 0.7);
 
-    --track: #243838;
-    --track-outline: #3a5454;
-    --disabled-bg: #2c3c3c;
+  --track: #243838;
+  --track-outline: #3a5454;
+  --disabled-bg: #2c3c3c;
 
-    --tooltip-surface: #dcebeb;
-    --tooltip-text: #0f1a1a;
+  --tooltip-surface: #dcebeb;
+  --tooltip-text: #0f1a1a;
 
-    --canvas-bg: #1d2e2e;
-    --canvas-border: #4d6a6a;
-    --grid-line: #4d6a6a;
-  }
+  --canvas-bg: #1d2e2e;
+  --canvas-border: #4d6a6a;
+  --grid-line: #4d6a6a;
 }
 
 body {

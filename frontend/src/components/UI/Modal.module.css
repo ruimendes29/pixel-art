@@ -10,7 +10,7 @@
 }
 
 .modal {
-  background-color: var(--on-primary);
+  background-color: var(--surface);
   padding: 3rem;
   border-radius: 1rem;
   box-shadow: 0 2px 8px 2px var(--shadow-neutral);

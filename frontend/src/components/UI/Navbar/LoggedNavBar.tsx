@@ -4,6 +4,7 @@ import classes from "./LoggedNavBar.module.css";
 import NavbarPic from "./NavbarPic";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import IconButton from "../IconButton";
+import ThemeSwitcher from "../ThemeSwitcher";
 
 const LoggedNavBar = (props: { tabs: string[] }) => {
   const [open, setOpen] = useState(false);
@@ -25,6 +26,7 @@ const LoggedNavBar = (props: { tabs: string[] }) => {
         })}
       </li>
       <li className={`${classes["nav-pic"]}`}>
+        <ThemeSwitcher />
         <NavbarPic />
         <IconButton
           className={`${classes.burguer} ${open ? classes.open : ""}`}

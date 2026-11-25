@@ -2,12 +2,14 @@ import React, { Fragment } from "react";
 import {  useNavigate } from "react-router-dom";
 import classes from "./SimpleNavBar.module.css";
 import Button from "../Button";
+import ThemeSwitcher from "../ThemeSwitcher";
 
 const SimpleNavBar = () => {
   const navigate = useNavigate();
   return (
     <Fragment>
       <li className={`${classes.buttons}`}>
+        <ThemeSwitcher />
         <Button
           onClick={() => {
             navigate("/home/register");

@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { canvasActions } from "../../store/redux-store";
+import { onThemeChange } from "../../theme/theme";
+import { isTypingTarget } from "./shortcuts";
 import classes from "./Canvas.module.css";
 import {
   adjustcanvasWindowSize,
@@ -77,13 +79,6 @@ let lastPointSaved = { x: 0, y: 0 };
 let moved = { x: 0, y: 0 };
 let scrolled = 0;
 
-// Typing a space in a text field must not switch the canvas into panning
-const isTypingTarget = (target: EventTarget | null) => {
-  const el = target as HTMLElement | null;
-  if (!el) return false;
-  const tag = el.tagName;
-  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
-};
 
 const Canvas = React.forwardRef((props: any, ref: any) => {
   //from redux
@@ -121,14 +116,14 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
     };
   }, []);
 
-  // Redraw the grid when the OS switches between light and dark
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const redraw = () =>
-      dispatch({ type: "RESIZE", newSize: canvasWindowSize / canvasSize });
-    media.addEventListener("change", redraw);
-    return () => media.removeEventListener("change", redraw);
-  }, [canvasSize]);
+  // Redraw the grid when the theme changes (user's choice or the OS)
+  useEffect(
+    () =>
+      onThemeChange(() =>
+        dispatch({ type: "RESIZE", newSize: canvasWindowSize / canvasSize })
+      ),
+    [canvasSize]
+  );
   const [canvasInfo, dispatch] = useReducer(
     reducer,
     getInitialCanvas(canvasWindowSize)

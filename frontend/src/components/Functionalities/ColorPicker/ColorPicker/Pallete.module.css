@@ -39,7 +39,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--on-primary);
+  background-color: var(--surface);
   color: var(--primary-color);
   font-size: 0.6rem;
 }

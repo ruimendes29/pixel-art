@@ -1,0 +1,125 @@
+/* Sits outside the canvas's left edge (the canvas frame is the positioned
+   parent). drop-shadow follows the tab + card outline as one shape, like a
+   folder divider. */
+.panel {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 1rem);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* 100% is the canvas width: never wider than the free space on its left */
+  width: min(16rem, calc((100vw - 100%) / 2 - 2rem));
+  filter: drop-shadow(0 6px 12px var(--shadow-soft));
+}
+
+/* The tab: a trapezoid sticking up from the card's top-right corner */
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 2rem;
+  margin-right: 0.75rem;
+  padding: 0 0 0.1rem;
+  border: none;
+  background-color: var(--surface);
+  color: var(--primary-color);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  clip-path: polygon(16% 0, 84% 0, 100% 100%, 0 100%);
+  border-radius: 0.5rem 0.5rem 0 0;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+/* Collapsed: the tab stands alone, so it gets a bottom and looks like a tab
+   on a closed folder */
+.panel:not(.open) .tab {
+  height: 2.25rem;
+  clip-path: none;
+  border-radius: 0.6rem;
+  margin-right: 0;
+  width: 2.25rem;
+}
+
+/* clip-path would cut an outline, so keyboard focus fills the tab instead */
+.tab:hover,
+.tab:focus-visible {
+  outline: none;
+  background-color: var(--primary-color);
+  color: var(--on-primary);
+}
+
+.card {
+  align-self: stretch;
+  padding: 0.9rem 1rem 1rem;
+  border-radius: 0.75rem;
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+.card[hidden] {
+  display: none;
+}
+
+.title {
+  margin: 0 0 0.6rem;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--primary-color);
+  letter-spacing: 0.02em;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.45rem 0.75rem;
+  margin: 0;
+  font-size: var(--fs-xs);
+  align-items: center;
+}
+
+.list dd {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.keys {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.keys kbd {
+  min-width: 1.4rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.3rem;
+  border: 1px solid var(--outline);
+  border-bottom-width: 2px;
+  background-color: var(--primary-tint);
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-align: center;
+}
+
+.plus,
+.word {
+  color: var(--text-faint);
+}
+
+/* Phones and tablets: no room beside the canvas and usually no keyboard */
+@media screen and (max-width: 60em) {
+  .panel {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab {
+    transition: none;
+  }
+}

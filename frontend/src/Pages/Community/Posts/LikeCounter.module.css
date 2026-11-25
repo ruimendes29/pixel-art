@@ -1,7 +1,7 @@
 .counter{
     color: var(--primary-color,black);
     font-size: var(--fs-base);
-    background-color: var(--on-primary);
+    background-color: var(--surface);
     display: flex;
     justify-content: space-around;
     align-items: center;

@@ -1,5 +1,5 @@
 import { configureStore, createSlice } from "@reduxjs/toolkit";
-import { Brushes } from "../components/Canvas/CanvasOperations/canvas-utils";
+import { Brushes } from "../components/Canvas/CanvasOperations/brushes";
 
 const userManagementSlice = createSlice({
   name: "userManagement",

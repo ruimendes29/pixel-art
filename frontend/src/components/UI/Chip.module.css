@@ -37,7 +37,7 @@
 }
 
 .secondary {
-    background-color: var(--on-primary);
+    background-color: var(--surface);
     color: var(--primary-color);
     box-shadow: inset 0 0 0 1.5px var(--primary-color);
 }

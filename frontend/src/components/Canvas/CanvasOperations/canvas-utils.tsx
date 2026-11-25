@@ -8,14 +8,7 @@ import {
 } from "./grid-helpers";
 import store, { canvasActions } from "../../../store/redux-store";
 
-export enum Brushes {
-  normal,
-  eye,
-  fill,
-  zoomin,
-  zoomout,
-  eraser,
-}
+export { Brushes } from "./brushes";
 
 export const getMousePos = (
   canvas: { getBoundingClientRect: () => any },

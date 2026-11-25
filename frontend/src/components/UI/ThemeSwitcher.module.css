@@ -1,0 +1,45 @@
+/* Small segmented control: the active option is filled with the primary colour */
+.switcher {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 0.125rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background-color: var(--primary-tint);
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--primary-color);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.option:hover {
+  background-color: var(--primary-tint-strong);
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 1px;
+}
+
+.option[aria-pressed="true"] {
+  background-color: var(--primary-color);
+  color: var(--on-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option {
+    transition: none;
+  }
+}

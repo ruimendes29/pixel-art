@@ -25,6 +25,17 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Pixel Art</title>
+    <script>
+      // Pick the theme before the first paint (same rules as src/theme/theme.ts):
+      // a saved "light"/"dark" wins, otherwise follow the operating system.
+      (function () {
+        var saved = null;
+        try { saved = localStorage.getItem("theme"); } catch (e) {}
+        var dark = saved === "dark" ||
+          (saved !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+      })();
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
