@@ -9,6 +9,7 @@ A free web app for creating pixel art in the browser: draw on a grid, save your 
 ## Features
 
 - Grid-based pixel editor with a colour picker
+- Export a drawing as PNG or as SVG (crisp edges, empty cells left transparent, same-coloured runs merged into one `<rect>`)
 - User accounts with JWT authentication and bcrypt-hashed passwords
 - Save, list and delete artwork; organise it into groups
 - Likes on other users' artwork
@@ -66,7 +67,7 @@ npx playwright install chromium   # first time only
 npm run test:e2e                  # Playwright E2E tests against the build
 ```
 
-The Playwright tests serve `build/` on port 4173 and drive the editor as a guest, so they need neither the API nor MySQL; any request to `/api` is intercepted and fails the test. They check that painting a cell changes the canvas pixels, that the eraser clears them, that the eyedropper picks a painted colour and that *Download as PNG* saves a real PNG file. Run `npm run build` again after changing the source.
+The Playwright tests serve `build/` on port 4173 and drive the editor as a guest, so they need neither the API nor MySQL; any request to `/api` is intercepted and fails the test. They check that painting a cell changes the canvas pixels, that the eraser clears them, that the eyedropper picks a painted colour, that *Download as PNG* saves a real PNG file and that *Export as SVG* saves an SVG that parses and holds the expected rects. Run `npm run build` again after changing the source.
 
 GitHub Actions (`.github/workflows/ci.yml`) runs the build, Vitest and Playwright (Chromium) on every push and pull request, and uploads the Playwright report when a test fails.
 

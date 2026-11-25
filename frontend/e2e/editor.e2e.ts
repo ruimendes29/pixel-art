@@ -117,6 +117,41 @@ test("Download as PNG saves a PNG file", async ({ page }) => {
   expect([...file.subarray(0, 8)]).toEqual([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 });
 
+test("Export as SVG saves an SVG with one rect per run of painted cells", async ({ page }) => {
+  await setColour(page, "#ff0000");
+  await clickCell(page, 2, 3);
+  await clickCell(page, 3, 3);
+
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Project actions" }).click();
+  await page.getByRole("menuitem", { name: "Export as SVG" }).click();
+  const download = await downloadPromise;
+
+  expect(download.suggestedFilename()).toBe("project.svg");
+  const text = await readFile(await download.path(), "utf8");
+  // Parse with the browser's XML parser: a malformed file yields a <parsererror> document
+  const svg = await page.evaluate((source) => {
+    const doc = new DOMParser().parseFromString(source, "image/svg+xml");
+    const root = doc.documentElement;
+    return {
+      root: root.nodeName,
+      viewBox: root.getAttribute("viewBox"),
+      title: root.querySelector("title")?.textContent,
+      rects: [...root.querySelectorAll("rect")].map((r) =>
+        ["x", "y", "width", "height", "fill"].map((a) => r.getAttribute(a))
+      ),
+    };
+  }, text);
+
+  // The two adjacent red cells are merged into one 2-cell-wide rect (cells are 10 units)
+  expect(svg).toEqual({
+    root: "svg",
+    viewBox: `0 0 ${GRID * 10} ${GRID * 10}`,
+    title: "E2E",
+    rects: [["20", "30", "20", "10", "#ff0000"]],
+  });
+});
+
 test("the toolbar sits under the centred canvas", async ({ page }) => {
   const box = (await canvas(page).boundingBox())!;
   const toolbar = (await page.getByRole("toolbar", { name: "Canvas tools" }).boundingBox())!;

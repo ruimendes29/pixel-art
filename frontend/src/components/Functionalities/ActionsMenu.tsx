@@ -15,6 +15,7 @@ const ActionsMenu = (props: {
   shared: boolean;
   onSave: () => void;
   onDownload: () => void;
+  onDownloadSvg: () => void;
   onShare: () => void;
 }) => {
   const isRegistered = !!localStorage.getItem("token");
@@ -62,6 +63,9 @@ const ActionsMenu = (props: {
           )}
           <button role="menuitem" onClick={run(props.onDownload)}>
             <FontAwesomeIcon icon={faDownload} fixedWidth /> Download as PNG
+          </button>
+          <button role="menuitem" onClick={run(props.onDownloadSvg)}>
+            <FontAwesomeIcon icon={faDownload} fixedWidth /> Export as SVG
           </button>
           {isRegistered && (
             <button role="menuitem" disabled={props.shared} onClick={run(props.onShare)}>

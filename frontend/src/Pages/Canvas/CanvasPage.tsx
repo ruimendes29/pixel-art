@@ -22,6 +22,7 @@ import Functionalities from "../../components/Functionalities/Functionalities";
 import ReferenceImage from "../../components/Functionalities/ReferenceImage";
 import useHttp, { COMMON_URL } from "../../hooks/use-http";
 import { canvasActions } from "../../store/redux-store";
+import { gridToSvg } from "../../components/Canvas/CanvasOperations/grid-to-svg";
 import FilterModal from "../Community/FilterModal";
 import { toggleTag } from "../Community/tags";
 import classes from "./CanvasPage.module.css";
@@ -112,6 +113,23 @@ const CanvasPage = () => {
       ctx.drawImage(previousImage, 0, 0); // Or at whatever offset you like
     };
     previousImage.src = previousCanvasURL;
+  };
+
+  const handleDownloadSvg = () => {
+    const svg = gridToSvg(
+      { cols: canvasSize, rows: canvasSize, cells: paintedSquares },
+      10,
+      canvasName || "Pixel art"
+    );
+    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+    const element = document.createElement("a");
+    element.href = url;
+    element.download = "project.svg";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    // Revoke after the click is handled; revoking at once can cancel the download in some browsers
+    setTimeout(() => URL.revokeObjectURL(url));
   };
 
   const checkShared = useCallback(async () => {
@@ -255,6 +273,7 @@ const CanvasPage = () => {
                 onDownload={() => {
                   handleDownloadCanvas();
                 }}
+                onDownloadSvg={handleDownloadSvg}
                 onSave={() => {
                   handleSaveCanvas();
                 }}

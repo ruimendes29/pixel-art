@@ -10,6 +10,7 @@ const Functionalities = (props: {
   shared: boolean;
   onSave: () => void;
   onDownload: () => void;
+  onDownloadSvg: () => void;
   onShare: () => void;
 }) => (
   <div className={classes.toolbar} role="toolbar" aria-label="Canvas tools">
