@@ -244,8 +244,9 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
     const limit = 5;
     const velocity = 0.3;
     const zoomedSquaredSize = canvasInfo.squareSize * canvasInfo.zoom;
-    //sliding right (from left to right)
-    if (e.screenX >= lastPointSaved.x + limit) {
+    // The drawing follows the pointer, like dragging a sheet of paper:
+    // pointer moves left -> drawing moves left (reveals what's on the right)
+    if (e.screenX <= lastPointSaved.x - limit) {
       const colsInScreen = canvasWindowSize / zoomedSquaredSize;
       if (Math.abs(moved.x - velocity) + colsInScreen < canvasSize) {
         dispatchPanned(e, { x: -velocity, y: 0 });
@@ -260,8 +261,8 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
         );
       }
     }
-    //sliding left (from right to left)
-    if (e.screenX <= lastPointSaved.x - limit) {
+    // pointer moves right -> drawing moves right
+    if (e.screenX >= lastPointSaved.x + limit) {
       if (moved.x + velocity < 0) {
         dispatchPanned(e, { x: velocity, y: 0 });
       } else if (moved.x < 0) {
@@ -269,7 +270,8 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
       }
     }
 
-    if (e.screenY >= lastPointSaved.y + limit) {
+    // pointer moves up -> drawing moves up
+    if (e.screenY <= lastPointSaved.y - limit) {
       const rowsInScreen = canvasWindowSize / zoomedSquaredSize;
       if (Math.abs(moved.y - velocity) + rowsInScreen < canvasSize) {
         dispatchPanned(e, { y: -velocity, x: 0 });
@@ -284,7 +286,8 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
         );
       }
     }
-    if (e.screenY <= lastPointSaved.y - limit) {
+    // pointer moves down -> drawing moves down
+    if (e.screenY >= lastPointSaved.y + limit) {
       if (moved.y + velocity < 0) {
         dispatchPanned(e, { y: velocity, x: 0 });
       } else if (moved.y < 0) {
@@ -327,7 +330,8 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
 
   const handleMousePressed = (e: any) => {
     if (e.button === 1) e.preventDefault(); // no autoscroll icon, we pan instead
-    lastPointSaved = { x: e.clientX, y: e.clientY };
+    // screen coordinates, like handlePanning compares against
+    lastPointSaved = { x: e.screenX, y: e.screenY };
     const canvas: HTMLCanvasElement = ref.current!;
     const { x, y } = getMousePos(canvas, e);
     if (pickingColor) dispatchRedux(canvasActions.changePickingColor());

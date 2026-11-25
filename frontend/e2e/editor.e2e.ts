@@ -238,6 +238,65 @@ test("the shortcuts sidebar sits left of the canvas and remembers being collapse
   expect(await page.evaluate(() => localStorage.getItem("shortcuts-panel-open"))).toBe("false");
 });
 
+test("the shortcuts tab stays in the same place open or closed", async ({ page }) => {
+  const tab = page.getByRole("button", { name: "Keyboard shortcuts" });
+  const open = (await tab.boundingBox())!;
+  await tab.click();
+  await expect(tab).toHaveAttribute("aria-expanded", "false");
+  expect(await tab.boundingBox()).toEqual(open);
+  await tab.click();
+  await expect(tab).toHaveAttribute("aria-expanded", "true");
+  expect(await tab.boundingBox()).toEqual(open);
+});
+
+test("the shortcuts card keeps its border after switching from dark to light", async ({ page }) => {
+  const border = () =>
+    page.locator("#shortcuts-list").evaluate((el) => {
+      const s = getComputedStyle(el);
+      return `${s.borderTopWidth} ${s.borderTopStyle} ${s.borderTopColor}`;
+    });
+  await page.getByRole("button", { name: "Dark theme" }).click();
+  await expect.poll(border).toMatch(/^1px solid rgba\(220, 235, 235/);
+  await page.getByRole("button", { name: "Light theme" }).click();
+  await expect.poll(border).toMatch(/^1px solid rgba\(31, 59, 59/);
+});
+
+test("dragging moves the drawing the same way as the pointer", async ({ page }) => {
+  await setColour(page, "#ff0000");
+  await clickCell(page, 5, 5);
+  const box = (await canvas(page).boundingBox())!;
+  const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+
+  // Zoom in so there is room to pan
+  await page.mouse.move(centre.x, centre.y);
+  for (let i = 0; i < 6; i++) await page.mouse.wheel(0, -100);
+
+  // Average x of the red pixels on the canvas
+  const redX = () =>
+    canvas(page).evaluate((c: HTMLCanvasElement) => {
+      const { data, width } = c.getContext("2d")!.getImageData(0, 0, c.width, c.height);
+      let sum = 0;
+      let n = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        if (data[i] === 255 && data[i + 1] === 0 && data[i + 2] === 0) {
+          sum += (i / 4) % width;
+          n++;
+        }
+      }
+      return n ? sum / n : NaN;
+    });
+  const before = await redX();
+  expect(before).not.toBeNaN();
+
+  await page.keyboard.down("Space");
+  await page.mouse.down();
+  for (let dx = 10; dx <= 150; dx += 10) await page.mouse.move(centre.x + dx, centre.y);
+  await page.mouse.up();
+  await page.keyboard.up("Space");
+
+  await expect.poll(redX).toBeGreaterThan(before);
+});
+
 test("scrolling over the canvas doesn't scroll the page", async ({ page }) => {
   // Short viewport so the page itself can scroll
   await page.setViewportSize({ width: 390, height: 600 });

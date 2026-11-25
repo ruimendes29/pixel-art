@@ -1,6 +1,7 @@
 /* Sits outside the canvas's left edge (the canvas frame is the positioned
-   parent). drop-shadow follows the tab + card outline as one shape, like a
-   folder divider. */
+   parent). The "?" tab sits on top of the card like a folder divider tab.
+   Rule: the tab keeps the exact same box in both states (only its bottom
+   border and corners change), so it never moves under the pointer. */
 .panel {
   position: absolute;
   top: 0;
@@ -11,39 +12,42 @@
   align-items: flex-end;
   /* 100% is the canvas width: never wider than the free space on its left */
   width: min(16rem, calc((100vw - 100%) / 2 - 2rem));
-  filter: drop-shadow(0 6px 12px var(--shadow-soft));
 }
 
-/* The tab: a trapezoid sticking up from the card's top-right corner */
+/* Same width, height and margins open or closed */
 .tab {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 3.25rem;
-  height: 2rem;
-  margin-right: 0.75rem;
-  padding: 0 0 0.1rem;
-  border: none;
+  box-sizing: border-box;
+  width: 2.75rem;
+  height: 2.1rem;
+  margin: 0 0.75rem -1px 0;
+  padding: 0;
+  border: 1px solid var(--outline);
+  border-radius: 0.6rem 0.6rem 0 0;
   background-color: var(--surface);
   color: var(--primary-color);
   font-size: var(--fs-sm);
   cursor: pointer;
-  clip-path: polygon(16% 0, 84% 0, 100% 100%, 0 100%);
-  border-radius: 0.5rem 0.5rem 0 0;
+  box-shadow: 0 -2px 6px var(--shadow-soft);
   transition: color 0.15s ease, background-color 0.15s ease;
 }
 
-/* Collapsed: the tab stands alone, so it gets a bottom and looks like a tab
-   on a closed folder */
-.panel:not(.open) .tab {
-  height: 2.25rem;
-  clip-path: none;
-  border-radius: 0.6rem;
-  margin-right: 0;
-  width: 2.25rem;
+/* Open: no visible bottom border, so the tab and the card read as one piece
+   (the -1px margin lets the tab cover the card's top border under it) */
+.panel.open .tab {
+  border-bottom-color: var(--surface);
 }
 
-/* clip-path would cut an outline, so keyboard focus fills the tab instead */
+/* Closed: the tab stands alone, with all four corners rounded */
+.panel:not(.open) .tab {
+  border-radius: 0.6rem;
+  box-shadow: 0 1px 2px var(--shadow-soft), 0 4px 12px var(--shadow-soft);
+}
+
 .tab:hover,
 .tab:focus-visible {
   outline: none;
@@ -51,12 +55,28 @@
   color: var(--on-primary);
 }
 
+.panel.open .tab:hover,
+.panel.open .tab:focus-visible {
+  border-bottom-color: var(--primary-color);
+}
+
+/* Focus ring drawn with box-shadow so it doesn't change the tab's box */
+.tab:focus-visible {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--primary-color);
+}
+
+/* Real border plus a light shadow: visible in both themes (a shadow alone
+   disappears on dark, and the old filter shadow wasn't repainted when the
+   theme changed) */
 .card {
   align-self: stretch;
+  box-sizing: border-box;
   padding: 0.9rem 1rem 1rem;
+  border: 1px solid var(--outline);
   border-radius: 0.75rem;
   background-color: var(--surface);
   color: var(--text);
+  box-shadow: 0 1px 2px var(--shadow-soft), 0 8px 24px var(--shadow-soft);
 }
 
 .card[hidden] {
