@@ -12,7 +12,7 @@
   font-size: var(--fs-sm);
   width: 100%;
   border-color: var(--primary-color);
-  background-color: white;
+  background-color: var(--on-primary);
   padding: 1rem 0.3rem;
   color: var(--primary-color);
 }

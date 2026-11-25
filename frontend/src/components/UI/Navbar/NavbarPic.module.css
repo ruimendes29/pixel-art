@@ -19,10 +19,10 @@
 
 .menu-buttons {
   padding: 1rem;
-  background-color: white;
+  background-color: var(--on-primary);
   z-index: 99999;
 
-  box-shadow: 0px 4px 10px -8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 4px 10px -8px var(--shadow-neutral);
   position: absolute;
   bottom: -4.4rem;
 }

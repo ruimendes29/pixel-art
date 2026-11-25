@@ -21,9 +21,9 @@
   font-weight: 500;
   margin-left: 4rem;
   aspect-ratio: 1/1;
-  background-color: white;
+  background-color: var(--on-primary);
   color: var(--primary-color);
-  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 5px 20px var(--shadow-neutral);
   border-radius: 50%;
 }
 
@@ -40,8 +40,8 @@
   align-items: center;
   position: absolute;
   inset: 0;
-  color: white;
-  background-color: rgba(31, 59, 59, 0.6);
+  color: var(--on-primary);
+  background-color: var(--overlay-strong);
 }
 
 .btn {

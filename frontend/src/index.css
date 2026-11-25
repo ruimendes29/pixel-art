@@ -21,7 +21,89 @@
   --strength-5: #2fae8f;
 }
 
+/* ---------------------------------------------------------------------------
+   Colour themes. Two maps with the same variable names: the light map is the
+   default and the dark map replaces it when the operating system is set to
+   dark mode. Components only use these names, never raw colours.
+   --------------------------------------------------------------------------- */
+
+/* Light theme map */
+:root {
+  color-scheme: light;
+
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --text: #1f3b3b;
+  --text-strong: #3c3c3c;
+  --text-muted: #6f8a8a;
+  --text-faint: #9bb0b0;
+  --on-primary: #ffffff;
+
+  --primary-tint: rgba(59, 191, 191, 0.08);
+  --primary-tint-strong: rgba(59, 191, 191, 0.12);
+  --primary-line: rgba(59, 191, 191, 0.3);
+
+  --outline: rgba(31, 59, 59, 0.25);
+  --shadow-soft: rgba(31, 59, 59, 0.15);
+  --shadow: rgba(31, 59, 59, 0.2);
+  --shadow-strong: rgba(31, 59, 59, 0.25);
+  --shadow-neutral: rgba(0, 0, 0, 0.25);
+  --overlay: rgba(31, 59, 59, 0.45);
+  --overlay-strong: rgba(31, 59, 59, 0.6);
+
+  --track: #e4f3f3;
+  --track-outline: #b9d3d3;
+  --disabled-bg: #d3d3d3;
+
+  --tooltip-surface: #1f3b3b;
+  --tooltip-text: #ffffff;
+
+  --canvas-bg: #ffffff;
+  --canvas-border: #000000;
+  --grid-line: #000000;
+}
+
+/* Dark theme map */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --bg: #0f1a1a;
+    --surface: #182727;
+    --text: #dcebeb;
+    --text-strong: #c4d4d4;
+    --text-muted: #93abab;
+    --text-faint: #6b8383;
+    --on-primary: #0f1a1a;
+
+    --primary-tint: rgba(59, 191, 191, 0.12);
+    --primary-tint-strong: rgba(59, 191, 191, 0.2);
+    --primary-line: rgba(59, 191, 191, 0.35);
+
+    --outline: rgba(220, 235, 235, 0.3);
+    --shadow-soft: rgba(0, 0, 0, 0.35);
+    --shadow: rgba(0, 0, 0, 0.4);
+    --shadow-strong: rgba(0, 0, 0, 0.5);
+    --shadow-neutral: rgba(0, 0, 0, 0.5);
+    --overlay: rgba(0, 0, 0, 0.6);
+    --overlay-strong: rgba(0, 0, 0, 0.7);
+
+    --track: #243838;
+    --track-outline: #3a5454;
+    --disabled-bg: #2c3c3c;
+
+    --tooltip-surface: #dcebeb;
+    --tooltip-text: #0f1a1a;
+
+    --canvas-bg: #1d2e2e;
+    --canvas-border: #4d6a6a;
+    --grid-line: #4d6a6a;
+  }
+}
+
 body {
+  background-color: var(--bg);
+  color: var(--text);
   font-size: var(--fs-base);
   line-height: 1.5;
 }

@@ -33,11 +33,11 @@
 
 .primary {
     background-color: var(--primary-color);
-    color: white;
+    color: var(--on-primary);
 }
 
 .secondary {
-    background-color: white;
+    background-color: var(--on-primary);
     color: var(--primary-color);
     box-shadow: inset 0 0 0 1.5px var(--primary-color);
 }

@@ -80,6 +80,12 @@ export const adjustcanvasWindowSize = () => {
   return Math.min(window.innerHeight - 230, window.innerWidth * 0.9);
 };
 
+// Grid line colour comes from the current theme (see --grid-line in index.css)
+export const getGridColor = () =>
+  getComputedStyle(document.documentElement)
+    .getPropertyValue("--grid-line")
+    .trim() || "black";
+
 export const drawGrid = (
   canvasInfo: {
     cols: number;
@@ -95,6 +101,7 @@ export const drawGrid = (
   squareSize *= zoom;
   ctx.globalAlpha = 1.0;
   paintStoredSquares(canvasInfo, ctx);
+  ctx.strokeStyle = getGridColor();
   for (
     let c = -1 * (1 - startCol) * squareSize;
     c <= cols * squareSize;
@@ -158,7 +165,7 @@ export const paintSquare = (
     (brushSizeAux * 2 + 1) * zoomedSquaredSize
   );
   ctx.fill();
-  ctx.fillStyle = "black";
+  ctx.strokeStyle = getGridColor();
   ctx.rect(
     (col - brushSizeAux) * zoomedSquaredSize,
     (row - brushSizeAux) * zoomedSquaredSize,
@@ -211,7 +218,7 @@ export const clearSquare = (
     (brushSizeAux * 2 + 1) * zoomedSquaredSize,
     (brushSizeAux * 2 + 1) * zoomedSquaredSize
   );
-  ctx.fillStyle = "black";
+  ctx.strokeStyle = getGridColor();
   ctx.rect(
     (col - brushSizeAux) * zoomedSquaredSize,
     (row - brushSizeAux) * zoomedSquaredSize,

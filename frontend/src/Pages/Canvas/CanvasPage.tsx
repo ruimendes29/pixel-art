@@ -247,8 +247,9 @@ const CanvasPage = () => {
       <div className={`${classes.under}`}>
         {isOwner && (
           <Fragment>
-            <ReferenceImage />
-            <Canvas ref={canvasRef} />
+            <Canvas ref={canvasRef}>
+              <ReferenceImage />
+            </Canvas>
             <Functionalities
                 saving={httpInfo.isLoading}
                 shared={isShared}

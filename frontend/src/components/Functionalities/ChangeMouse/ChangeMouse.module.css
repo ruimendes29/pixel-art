@@ -18,7 +18,7 @@
   width: 1.25rem;
   height: 1.25rem;
   border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(31, 59, 59, 0.25);
+  box-shadow: 0 0 0 1px var(--outline);
 }
 
 .size > input {

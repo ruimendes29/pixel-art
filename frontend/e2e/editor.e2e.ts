@@ -148,6 +148,56 @@ test("a reference image is set behind the canvas and can be removed", async ({ p
   await expect(page.getByRole("button", { name: "Add reference image" })).toBeVisible();
 });
 
+test("the reference image button sits outside the canvas's top-right corner", async ({ page }) => {
+  const box = (await canvas(page).boundingBox())!;
+  const button = (await page.getByRole("button", { name: "Add reference image" }).boundingBox())!;
+
+  expect(button.x).toBeGreaterThanOrEqual(box.x + box.width);
+  expect(Math.abs(button.y - box.y)).toBeLessThan(4);
+});
+
+test("the reference image button explains itself in a tooltip", async ({ page }) => {
+  const button = page.getByRole("button", { name: "Add reference image" });
+  const tooltip = page.getByRole("tooltip");
+
+  await button.hover();
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip).toContainText("behind the grid");
+  await expect(button).toHaveAttribute("aria-describedby", "app-tooltip");
+
+  await page.keyboard.press("Escape");
+  await expect(tooltip).toBeHidden();
+  await expect(button).not.toHaveAttribute("aria-describedby", /app-tooltip/);
+});
+
+test("the cursor is a hand while panning, also when holding space", async ({ page }) => {
+  const cursor = () => canvas(page).evaluate((c) => getComputedStyle(c).cursor);
+  const { x, y } = (await canvas(page).boundingBox())!;
+  expect(await cursor()).not.toMatch(/grab/);
+
+  // Space held: open hand, closed hand while dragging
+  await page.keyboard.down("Space");
+  await expect.poll(cursor).toBe("grab");
+  await page.mouse.move(x + 50, y + 50);
+  await page.mouse.down();
+  await expect.poll(cursor).toBe("grabbing");
+  await page.mouse.up();
+  await page.keyboard.up("Space");
+  await expect.poll(cursor).not.toMatch(/grab/);
+
+  // Move tool selected: same hand without the keyboard
+  await page.getByRole("button", { name: "Move canvas" }).click();
+  await expect.poll(cursor).toBe("grab");
+});
+
+test("the theme follows the system's dark mode", async ({ page }) => {
+  const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  await page.emulateMedia({ colorScheme: "light" });
+  expect(await bg()).toBe("rgb(255, 255, 255)");
+  await page.emulateMedia({ colorScheme: "dark" });
+  expect(await bg()).toBe("rgb(15, 26, 26)");
+});
+
 test("scrolling over the canvas doesn't scroll the page", async ({ page }) => {
   // Short viewport so the page itself can scroll
   await page.setViewportSize({ width: 390, height: 600 });

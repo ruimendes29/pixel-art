@@ -77,18 +77,13 @@ let lastPointSaved = { x: 0, y: 0 };
 let moved = { x: 0, y: 0 };
 let scrolled = 0;
 
-let spacePressed = false;
-
-document.addEventListener("keydown", (event) => {
-  if (event.code === "Space") {
-    spacePressed = true; //whatever you want to do when space is pressed
-  }
-});
-document.addEventListener("keyup", (event) => {
-  if (event.code === "Space") {
-    spacePressed = false; //whatever you want to do when space is pressed
-  }
-});
+// Typing a space in a text field must not switch the canvas into panning
+const isTypingTarget = (target: EventTarget | null) => {
+  const el = target as HTMLElement | null;
+  if (!el) return false;
+  const tag = el.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
+};
 
 const Canvas = React.forwardRef((props: any, ref: any) => {
   //from redux
@@ -103,6 +98,37 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
 
   const [mousePressed, setMousePressed]: [number | undefined, any] =
     useState(undefined);
+  const [spacePressed, setSpacePressed] = useState(false);
+
+  // Holding space turns the cursor into a hand and pans instead of painting
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.code !== "Space" || isTypingTarget(e.target)) return;
+      e.preventDefault(); // don't scroll the page or press a focused button
+      if (!e.repeat) setSpacePressed(true);
+    };
+    const up = (e: KeyboardEvent) => {
+      if (e.code === "Space") setSpacePressed(false);
+    };
+    const reset = () => setSpacePressed(false);
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
+    window.addEventListener("blur", reset);
+    return () => {
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
+      window.removeEventListener("blur", reset);
+    };
+  }, []);
+
+  // Redraw the grid when the OS switches between light and dark
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const redraw = () =>
+      dispatch({ type: "RESIZE", newSize: canvasWindowSize / canvasSize });
+    media.addEventListener("change", redraw);
+    return () => media.removeEventListener("change", redraw);
+  }, [canvasSize]);
   const [canvasInfo, dispatch] = useReducer(
     reducer,
     getInitialCanvas(canvasWindowSize)
@@ -305,6 +331,7 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
   };
 
   const handleMousePressed = (e: any) => {
+    if (e.button === 1) e.preventDefault(); // no autoscroll icon, we pan instead
     lastPointSaved = { x: e.clientX, y: e.clientY };
     const canvas: HTMLCanvasElement = ref.current!;
     const { x, y } = getMousePos(canvas, e);
@@ -383,9 +410,19 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
     setMousePressed(e.button);
   };
 
+  const panReady = spacePressed || isPanning;
+  const panningNow =
+    mousePressed === 1 || (mousePressed === 0 && panReady);
+  const cursorClass = panningNow
+    ? classes.panning
+    : panReady
+    ? classes["pan-ready"]
+    : "";
+
   return (
     <div className={`${classes["canvas-holder"]}`}>
       <div className={`${classes.name}`}>{canvasName}</div>
+      <div className={classes.frame}>
       <canvas
         onMouseLeave={() => {
           setMousePressed(undefined);
@@ -408,12 +445,15 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
           }
         }}
         ref={ref}
-        className={`${classes.canvas}`}
+        className={`${classes.canvas} ${cursorClass}`}
         id="myCanvas"
         aria-label="Drawing canvas"
         width={canvasWindowSize}
         height={canvasWindowSize}
       />
+      {/* Controls anchored to the canvas edges, e.g. the reference image button */}
+      {props.children}
+      </div>
     </div>
   );
 });

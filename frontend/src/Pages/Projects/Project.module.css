@@ -2,7 +2,7 @@
     width: 100%;
     justify-self: center;
     text-align: center;
-    background-color: white;
+    background-color: var(--on-primary);
     margin:1rem 0;
   }
   

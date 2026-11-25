@@ -7,8 +7,15 @@
 }
 
 
+/* Positioned box around the canvas so controls can sit on its edges */
+.frame {
+  position: relative;
+  display: flex;
+}
+
 .canvas {
-  border: 1px solid black;
+  border: 1px solid var(--canvas-border);
+  background-color: var(--canvas-bg);
   /* touch gestures on the canvas don't scroll or zoom the page */
   touch-action: none;
 }
@@ -20,10 +27,11 @@
   margin-bottom: 0.5rem;
 }
 
-.space-pressed:hover {
+/* Hand cursor while panning is armed (space held or Move tool) and while dragging */
+.pan-ready {
   cursor: grab;
 }
 
-.panning:hover {
+.panning {
   cursor: grabbing;
 }
