@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const auth = require("../../resources/auth");
+const { assertFields, ValidationError } = require("../../resources/fields");
 
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.split("/")[0] === "image") cb(null, true);
@@ -30,7 +31,7 @@ router.get("/photo", async (req, res) => {
     res.type(photo.mime).send(photo.data);
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
@@ -42,7 +43,7 @@ router.get("/photo/:id", async (req, res) => {
     res.type(photo.mime).send(photo.data);
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
@@ -53,7 +54,7 @@ router.get("/name", async (req, res) => {
     res.status(200).jsonp({ username });
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 router.get("/name/:id", async (req, res) => {
@@ -63,7 +64,7 @@ router.get("/name/:id", async (req, res) => {
     res.status(200).jsonp({ username });
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
@@ -75,7 +76,7 @@ router.get("/id", async (req, res) => {
     res.status(200).jsonp({ id: userId });
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
@@ -84,38 +85,43 @@ router.get("/id", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const loginInfo = await controller.loginUser(
-      req.body.name,
-      req.body.password
-    );
+    const { username, loginPassword } = assertFields({
+      username: req.body.name,
+      loginPassword: req.body.password,
+    });
+    const loginInfo = await controller.loginUser(username, loginPassword);
 
     res.status(200).jsonp(loginInfo);
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
 router.post("/add-user", upload.single("image"), async (req, res) => {
   try {
-    if (!req.file) throw new Error("A profile picture is required!");
-    const { name, email, password } = req.body;
-    await controller.addUser(name, email, password, req.file);
+    const { username, email, password } = assertFields({
+      username: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+    });
+    if (!req.file) throw new ValidationError("A profile picture is required");
+    await controller.addUser(username, email, password, req.file);
     res.status(200).send({});
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
 router.post("/add-group/:groupName", async (req, res) => {
   try {
-    const { groupName } = req.params;
+    const { groupName } = assertFields({ groupName: req.params.groupName });
     await controller.addGroup(req.body.token, groupName);
     res.status(200).send({});
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
@@ -128,7 +134,7 @@ router.delete("/:name/:email/:password", async (req, res) => {
     res.status(200).send();
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 

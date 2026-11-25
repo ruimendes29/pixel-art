@@ -24,6 +24,9 @@
     margin: 0;
     height: inherit;
     font-size: var(--fs-base);
+    /* no browser default: it showed as a light box in dark mode */
+    background: transparent;
+    color: var(--text);
   }
 .search-bar > input::-webkit-search-cancel-button {
   display: none;

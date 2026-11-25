@@ -27,6 +27,7 @@ const Community = () => {
   return (
     <Fragment>
       <div className={`${classes.community}`}>
+        <h1 className={classes.title}>Community</h1>
         <div className={`${classes["search-header"]}`}>
           <SearchBar
             value={searchText}

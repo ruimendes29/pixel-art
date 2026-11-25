@@ -1,7 +1,7 @@
 import React from "react";
 import classes from "./Login.module.css";
 import Input from "../../components/UI/Input";
-import useInput from "../../hooks/use-input";
+import useField from "../../fields/use-field";
 import Button from "../../components/UI/Button";
 import useHttp, { COMMON_URL } from "../../hooks/use-http";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,10 +14,8 @@ const Login = () => {
   const navigate = useNavigate();
   const [httpInfo, sendHttpRequest] = useHttp();
   const dispatchRedux = useDispatch();
-  const nameInput = useInput((el: string) => el.trim() !== "");
-  const passwordInput = useInput((el: string) => {
-    return true;
-  });
+  const nameInput = useField("username");
+  const passwordInput = useField("loginPassword");
 
   const handleLogin = async () => {
     const loginToken = await sendHttpRequest({
@@ -44,29 +42,31 @@ const Login = () => {
         onChange={nameInput.valueChanged}
         value={nameInput.enteredValue}
         onBlur={nameInput.touchedHandler}
-        name="Username"
-        error="Name can not be empty!"
+        name={nameInput.label}
+        maxLength={nameInput.maxLength}
+        error={nameInput.error}
       />
       <Input
         invalid={passwordInput.isInputInvalid || httpInfo.error}
         onChange={passwordInput.valueChanged}
         value={passwordInput.enteredValue}
         onBlur={passwordInput.touchedHandler}
-        name="Password"
+        name={passwordInput.label}
+        maxLength={passwordInput.maxLength}
         type="password"
-        error={httpInfo.error ? httpInfo.error.message : undefined}
+        error={httpInfo.error ? httpInfo.error.message : passwordInput.error}
       />
       <Button
         onClick={() => {
           handleLogin();
         }}
         className={`${classes.btn}`}
-        secondary
+        primary
       >
         {httpInfo.isLoading ? (
           <FontAwesomeIcon className="fa-spin" icon={faCircleNotch} />
         ) : (
-          "Login"
+          "Log in"
         )}
       </Button>
     </div>

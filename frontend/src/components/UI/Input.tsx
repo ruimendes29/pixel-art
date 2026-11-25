@@ -11,6 +11,7 @@ const Input = (props: any) => {
         onBlur={props.onBlur}
         onChange={props.onChange}
         type={props.type || "text"}
+        maxLength={props.maxLength}
         id={`${props.name}`}
       />
     </div>

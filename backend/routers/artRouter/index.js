@@ -9,15 +9,18 @@ const upload = multer({
 
 const router = express.Router();
 const controller = require("../../controllers/art/art");
+const { assertFields, ValidationError } = require("../../resources/fields");
 
 // POSTS
 
 router.post("/share-project", async (req, res) => {
   try {
     const token = req.body.token;
-    const projectId = req.body.id;
     const tags = req.body.tags;
-    const description = req.body.description;
+    const { id: projectId, description } = assertFields({
+      id: req.body.id,
+      description: req.body.description,
+    });
 
     const s = await controller.shareProject(
       token,
@@ -31,14 +34,21 @@ router.post("/share-project", async (req, res) => {
   } catch (error) {
     //fs.unlinkSync(req.file.path);
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
 router.post("/add-project", async (req, res) => {
   try {
     console.log(req.body);
-    const { token, name, description, group, size } = req.body;
+    const { token } = req.body;
+    const { projectName: name, canvasSize: size, description } = assertFields({
+      projectName: req.body.name,
+      canvasSize: req.body.size,
+      description: req.body.description,
+    });
+    // no group means the project is not in one
+    const group = req.body.group ? assertFields({ id: req.body.group }).id : null;
 
     const s = await controller.createProject(
       token,
@@ -53,15 +63,15 @@ router.post("/add-project", async (req, res) => {
     //fs.unlinkSync(req.file.path);
     console.error(error);
 
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
 router.post("/add-image", upload.single("image"), async (req, res) => {
   try {
-    const { projectId } = req.body;
-
-    if (!req.file) throw new Error("No image was sent!");
+    const { id: projectId } = assertFields({ id: req.body.projectId });
+    if (!req.file) throw new ValidationError("No image was sent");
+    if (!req.file.mimetype.startsWith("image/")) throw new ValidationError("The file must be an image");
     await controller.addImageToProject(
       req.headers.authorization,
       req.file,
@@ -72,7 +82,7 @@ router.post("/add-image", upload.single("image"), async (req, res) => {
     //fs.unlinkSync(req.file.path);
     console.error(error);
 
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
@@ -85,7 +95,7 @@ router.get("/project-owner/:id", async (req, res) => {
     res.status(200).jsonp({ author });
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
@@ -96,7 +106,7 @@ router.get("/project-image/:id", async (req, res) => {
     res.type(image.mime).send(image.data);
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
@@ -107,7 +117,7 @@ router.get("/project-canvas/:id", async (req, res) => {
     res.status(200).jsonp({ ...canvas });
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
@@ -119,7 +129,7 @@ router.get("/projects", async (req, res) => {
     res.status(200).jsonp(projects);
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
@@ -130,7 +140,7 @@ router.get("/is-shared/:id", async (req, res) => {
     res.status(200).jsonp({ shared: isShared });
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
@@ -141,7 +151,7 @@ router.get("/shared-projects", async (req, res) => {
     res.status(200).jsonp(projects);
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 

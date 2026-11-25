@@ -2,6 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const controller = require("../../controllers/likes/likes");
+const { assertFields } = require("../../resources/fields");
 
 router.get("/number/:projectId", async (req, res) => {
   try {
@@ -10,7 +11,7 @@ router.get("/number/:projectId", async (req, res) => {
     res.status(200).jsonp({ likes: numberOfLikes });
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
@@ -22,19 +23,19 @@ router.get("/liked/:projectId", async (req, res) => {
     res.status(200).jsonp({ liked });
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
 router.post("/like", async (req, res) => {
   try {
     const token = req.body.token;
-    const projectId = req.body.projectId;
+    const { id: projectId } = assertFields({ id: req.body.projectId });
     const liked = await controller.likePost(token, projectId);
     res.status(200).jsonp({ liked });
   } catch (error) {
     console.error(error);
-    res.status(401).jsonp({ error: error.message });
+    res.status(error.status || 401).jsonp({ error: error.message });
   }
 });
 
@@ -47,7 +48,7 @@ router.delete("/:projectId", async(req,res) => {
     }
     catch (error) {
         console.error(error);
-        res.status(401).jsonp({ error: error.message });
+        res.status(error.status || 401).jsonp({ error: error.message });
       }
 })
 

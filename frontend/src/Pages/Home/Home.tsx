@@ -5,11 +5,11 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { Link, Route, Routes } from "react-router-dom";
 import Button from "../../components/UI/Button";
-import Shape from "../../components/UI/Shape";
 import useHttp, { COMMON_URL } from "../../hooks/use-http";
 import { userManagementActions } from "../../store/redux-store";
 import classes from "./Home.module.css";
 import Login from "./Login";
+import PracticeGrid from "./PracticeGrid";
 import Register from "./Register";
 
 const Home = () => {
@@ -36,77 +36,90 @@ const Home = () => {
   }, [logged, sendHttpRequest]);
 
   return (
-    <div className={`${classes.home}`}>
-      <Shape />
-
-      <Routes>
-        <Route
-          path={""}
-          element={
-            <Fragment>
-              {!logged && (
+    <Routes>
+      <Route
+        path={""}
+        element={
+          <section className={classes.hero}>
+            <div className={classes.intro}>
+              {!logged ? (
                 <Fragment>
-                  <div className={`${classes["info-text"]}`}>
-                    Create pixel art online for free and intuitively
-                  </div>
-                  <div className={`${classes.btns}`}>
-                    <Link to="login">
-                      <Button className={`${classes.btn}`} primary>
-                        Login
-                      </Button>
-                    </Link>
-                    <Link to={"register"}>
-                      <Button className={`${classes.btn}`} secondary>
-                        Register
-                      </Button>
-                    </Link>
+                  <h1 className={classes.title}>Draw pixel art in your browser</h1>
+                  <p className={classes.lead}>
+                    Free, with nothing to install. Paint on the grid to try it,
+                    then open the editor for a full drawing.
+                  </p>
+                  <div className={classes.btns}>
                     <Button
-                      onClick={() => {
-                        dispatchRedux(userManagementActions.handleGuest());
-                      }}
-                      className={`${classes.btn}`}
-                      secondary
+                      onClick={() => dispatchRedux(userManagementActions.handleGuest())}
+                      className={classes.btn}
+                      primary
                     >
                       Enter as guest
                     </Button>
-                  </div>
-                </Fragment>
-              )}
-              {logged && (
-                <Fragment>
-                  <div className={`${classes["info-text"]}`}>
-                    Welcome,{" "}
-                    {name ? (
-                      name
-                    ) : (
-                      <FontAwesomeIcon
-                        className="fa-spin"
-                        icon={faCircleNotch}
-                      />
-                    )}
-                    !
-                  </div>
-                  <div className={`${classes.btns}`}>
-                    <Link to="/community">
-                      <Button className={`${classes.btn}`} primary>
-                        Community
+                    <Link to="login">
+                      <Button className={classes.btn} secondary>
+                        Log in
                       </Button>
                     </Link>
-                    <Link to={"/projects/null"}>
-                      <Button className={`${classes.btn}`} secondary>
+                    <Link to="register">
+                      <Button className={classes.btn} secondary>
+                        Create account
+                      </Button>
+                    </Link>
+                  </div>
+                  <p className={classes.note}>
+                    Guests can draw and download. Create an account to save your
+                    drawings and share them with the community.
+                  </p>
+                </Fragment>
+              ) : (
+                <Fragment>
+                  <h1 className={classes.title}>
+                    Hi, {name || <FontAwesomeIcon className="fa-spin" icon={faCircleNotch} />}
+                  </h1>
+                  <p className={classes.lead}>
+                    Start a new drawing in Projects, or see what others have
+                    shared in the Community.
+                  </p>
+                  <div className={classes.btns}>
+                    <Link to="/projects/null">
+                      <Button className={classes.btn} primary>
                         Projects
                       </Button>
                     </Link>
+                    <Link to="/community">
+                      <Button className={classes.btn} secondary>
+                        Community
+                      </Button>
+                    </Link>
                   </div>
                 </Fragment>
               )}
-            </Fragment>
-          }
-        />
-        <Route path={"login"} element={<Login />} />
-        <Route path={"register"} element={<Register />} />
-      </Routes>
-    </div>
+            </div>
+            <PracticeGrid />
+          </section>
+        }
+      />
+      <Route
+        path={"login"}
+        element={
+          <div className={classes.form}>
+            <h1 className={classes["form-title"]}>Log in</h1>
+            <Login />
+          </div>
+        }
+      />
+      <Route
+        path={"register"}
+        element={
+          <div className={classes.form}>
+            <h1 className={classes["form-title"]}>Create account</h1>
+            <Register />
+          </div>
+        }
+      />
+    </Routes>
   );
 };
 

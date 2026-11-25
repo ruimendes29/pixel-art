@@ -1,0 +1,77 @@
+.practice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: min(100%, 26rem);
+}
+
+/* 16x16 cells; the gaps are the grid lines */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 1px;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 1px;
+  box-sizing: border-box;
+  background-color: var(--primary-line);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px var(--shadow), 0 16px 40px var(--shadow-soft);
+  cursor: crosshair;
+  touch-action: none; /* painting with a finger must not scroll the page */
+  user-select: none;
+  overflow: hidden;
+}
+
+.grid > span {
+  background-color: var(--canvas-bg);
+}
+
+.palette {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.swatch,
+.tool {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 2px solid var(--surface);
+  border-radius: 0.4rem;
+  box-shadow: 0 0 0 1px var(--outline);
+  cursor: pointer;
+}
+
+.tool {
+  background-color: var(--surface);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.swatch[aria-pressed="true"],
+.tool[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--text);
+}
+
+.tool[aria-pressed="true"] {
+  color: var(--text);
+}
+
+.swatch:focus-visible,
+.tool:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 3px;
+}
+
+/* all eight buttons on one row on phones */
+@media screen and (max-width: 30em) {
+  .swatch,
+  .tool {
+    width: 2rem;
+    height: 2rem;
+  }
+}

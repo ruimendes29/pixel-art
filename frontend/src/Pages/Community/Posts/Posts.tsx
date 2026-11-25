@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import card from "../../../components/UI/ArtCard.module.css";
 import classes from "./Posts.module.css";
 import Post from "./Post";
 import useHttp, { COMMON_URL } from "../../../hooks/use-http";
@@ -17,7 +18,9 @@ const Posts = (props: {
   useEffect(() => {
     // Ignore answers to older requests that arrive after a newer one was sent
     let current = true;
-    const query = new URLSearchParams({ tags: JSON.stringify(props.selectedCategories) });
+    const query = new URLSearchParams({
+      tags: JSON.stringify(props.selectedCategories),
+    });
     if (search) query.set("search", search);
     const fetchProjects = async () => {
       const projects = await sendHttpRequest({
@@ -37,19 +40,33 @@ const Posts = (props: {
   }, [sendHttpRequest, props.selectedCategories, search]);
 
   return (
-    <div className={`${classes["posts-holder"]}`}>
+    <div className={`${card.grid} ${classes["posts-holder"]}`}>
       {httpInfo.error && (
-        <p className={classes.error}>
-          Could not load the community posts. Try again later.
-        </p>
+        <div className={card.empty}>
+          <h2>Could not load the community posts</h2>
+          <p>The server did not answer. Reload the page to try again.</p>
+        </div>
       )}
-      {loaded && !httpInfo.error && !httpInfo.isLoading && posts.length === 0 && (
-        <p className={classes.error}>
-          {search || props.selectedCategories.length > 0
-            ? "No shared projects match your search or tags. Try fewer tags or other words."
-            : "No one has shared a project yet."}
-        </p>
-      )}
+      {loaded &&
+        !httpInfo.error &&
+        !httpInfo.isLoading &&
+        posts.length === 0 && (
+          <div className={card.empty}>
+            {search || props.selectedCategories.length > 0 ? (
+              <>
+                <h2>No shared projects match your search or tags</h2>
+                <p>Try fewer tags or other words.</p>
+              </>
+            ) : (
+              <>
+                <h2>Nothing shared yet</h2>
+                <p>
+                  Open a project and choose Share to community to be the first.
+                </p>
+              </>
+            )}
+          </div>
+        )}
       {posts.map((el: any) => (
         <Post
           authorId={el.author}

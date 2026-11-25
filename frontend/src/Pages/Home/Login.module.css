@@ -6,7 +6,7 @@
 
 /* Same column as the register form: full width on phones, capped on big screens */
 .inputs {
-  margin-top: 4rem;
+  margin-top: 0;
   width: min(90vw, var(--form-width));
   display: flex;
   flex-direction: column;

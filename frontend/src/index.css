@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Pixelify+Sans:wght@500;700&display=swap");
 
 :root {
   --primary-color: #3bbfbf;
@@ -12,6 +12,17 @@
   --fs-md: 1.125rem;
   --fs-lg: 1.375rem;
   --fs-xl: clamp(1.5rem, 1.1rem + 1.6vw, 2.125rem);
+  --fs-display: clamp(2.25rem, 1.4rem + 3.6vw, 4rem);
+
+  /* Pixel font for headlines only; everything else is Manrope */
+  --font-display: "Pixelify Sans", Manrope, sans-serif;
+  --font-body: Manrope, Helvetica, Arial, sans-serif;
+
+  /* Paint colours offered by the practice grid on the home page */
+  --paint-coral: #ff6b5b;
+  --paint-sun: #f2c230;
+  --paint-leaf: #9bcf3a;
+  --paint-plum: #7a5cc7;
 
   /* Widest a form column gets, so inputs don't stretch across big screens */
   --form-width: 28rem;
@@ -36,7 +47,8 @@
 :root {
   color-scheme: light;
 
-  --bg: #ffffff;
+  /* page is tinted so white surfaces (navbar, toolbar, cards) stand out */
+  --bg: #f2f7f7;
   --surface: #ffffff;
   --text: #1f3b3b;
   --text-strong: #3c3c3c;
@@ -115,7 +127,7 @@ body {
 }
 
 * {
-  font-family: Montserrat, "Open Sans", Helvetica, Arial, sans-serif;
+  font-family: var(--font-body);
 }
 
 html,

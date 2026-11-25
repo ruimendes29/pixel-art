@@ -1,0 +1,37 @@
+{
+  "$comment": "Single source of truth for every form field. The frontend (src/fields/validate.ts) and the backend (backend/resources/fields.js) both read this file and apply the same rules. 'types' says what every field of that type must have; 'fields' maps an input key to its type and limits.",
+  "types": {
+    "text": { "requires": ["maxLength"], "trim": true },
+    "textarea": { "requires": ["maxLength"], "trim": true },
+    "email": { "requires": ["maxLength"], "trim": true, "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$", "patternMessage": "must be a valid address" },
+    "password": { "requires": ["maxLength"], "trim": false },
+    "int": { "requires": ["min", "max"], "decimals": 0 },
+    "float": { "requires": ["min", "max"], "decimals": 2 }
+  },
+  "fields": {
+    "username": { "type": "text", "label": "Username", "required": true, "maxLength": 100 },
+    "email": { "type": "email", "label": "Email", "required": true, "maxLength": 255 },
+    "password": {
+      "type": "password",
+      "label": "Password",
+      "required": true,
+      "maxLength": 72,
+      "rules": [
+        { "label": "8 or more characters", "minLength": 8 },
+        { "label": "A lowercase letter", "pattern": "[a-z]" },
+        { "label": "An uppercase letter", "pattern": "[A-Z]" },
+        { "label": "A number", "pattern": "[0-9]" },
+        { "label": "A symbol, like ! or #", "pattern": "[`!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?~]" }
+      ]
+    },
+    "loginPassword": { "type": "password", "label": "Password", "required": true, "maxLength": 72 },
+    "projectName": { "type": "text", "label": "Project name", "required": true, "maxLength": 100 },
+    "canvasSize": { "type": "int", "label": "Canvas size", "required": true, "min": 10, "max": 100 },
+    "groupName": { "type": "text", "label": "Group name", "required": true, "maxLength": 100 },
+    "description": { "type": "textarea", "label": "Description", "required": false, "maxLength": 1000 },
+    "tag": { "type": "text", "label": "Tag", "required": false, "maxLength": 50 },
+    "search": { "type": "text", "label": "Search", "required": false, "maxLength": 100 },
+    "id": { "type": "int", "label": "Id", "required": true, "min": 1, "max": 2147483647 }
+  },
+  "limits": { "maxTags": 20 }
+}

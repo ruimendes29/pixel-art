@@ -1,8 +1,9 @@
 // Tags come from the client, so they are checked and cleaned here before they
 // reach the database: trimmed, single spaces, at most 50 characters (Tag.name),
 // no blanks and no duplicates that differ only in case.
-const MAX_TAG_LENGTH = 50;
-const MAX_TAGS = 20;
+const { spec } = require("./fields");
+const MAX_TAG_LENGTH = spec.fields.tag.maxLength;
+const MAX_TAGS = spec.limits.maxTags;
 
 const normalizeTags = (tags) => {
   if (!Array.isArray(tags)) throw new Error("Tags must be a list");
@@ -34,7 +35,7 @@ const parseTagsQuery = (query) => {
 };
 
 // The ?search= query: trimmed, single spaces, at most 100 characters.
-const MAX_SEARCH_LENGTH = 100;
+const MAX_SEARCH_LENGTH = spec.fields.search.maxLength;
 const parseSearchQuery = (query) =>
   typeof query === "string" ? query.trim().replace(/\s+/g, " ").slice(0, MAX_SEARCH_LENGTH) : "";
 

@@ -1,15 +1,13 @@
+import { field, passesRule } from "../../fields/validate";
+
+// The password checklist comes from the shared field rules (fields/fields.json),
+// the same list the backend enforces at sign-up.
 export type PasswordRule = { label: string; test: (value: string) => boolean };
 
-export const PASSWORD_RULES: PasswordRule[] = [
-  { label: "8 or more characters", test: (v) => v.length >= 8 },
-  { label: "A lowercase letter", test: (v) => /[a-z]/.test(v) },
-  { label: "An uppercase letter", test: (v) => /[A-Z]/.test(v) },
-  { label: "A number", test: (v) => /[0-9]/.test(v) },
-  {
-    label: "A symbol, like ! or #",
-    test: (v) => /[`!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/.test(v),
-  },
-];
+export const PASSWORD_RULES: PasswordRule[] = field("password").rules!.map((rule) => ({
+  label: rule.label,
+  test: (value) => passesRule(rule, value),
+}));
 
 export const countMetRules = (value: string) =>
   PASSWORD_RULES.filter((rule) => rule.test(value)).length;

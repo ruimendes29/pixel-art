@@ -1,6 +1,7 @@
 const sqlController = require("../../resources/db");
 const bcrypt = require("bcryptjs");
 const auth = require("../../resources/auth");
+const { ValidationError } = require("../../resources/fields");
 require("dotenv").config();
 
 const checkUser = async (name, email) => {
@@ -48,8 +49,13 @@ const loginUser = async (username, password) => {
   };
 };
 
+const isUsernameUsed = async (username) => {
+  const sql = `SELECT id FROM User WHERE LOWER(username)=LOWER(?) LIMIT 1`;
+  return (await sqlController.queryDataBase(sql, [username])).length > 0;
+};
+
 const isEmailUsed = async (email) => {
-  const checkIfEmailExists = `SELECT * FROM User WHERE email=?`;
+  const checkIfEmailExists = `SELECT id FROM User WHERE LOWER(email)=LOWER(?) LIMIT 1`;
   const returnedRows = await sqlController.queryDataBase(checkIfEmailExists, [
     email,
   ]);
@@ -57,35 +63,28 @@ const isEmailUsed = async (email) => {
   return returnedRows.length > 0;
 };
 
+// name, email and password were already checked against the shared field rules
+// (resources/fields.js) by the router
 const addUser = async (name, email, password, photo) => {
-  //verify the inputs in the backend
-  const checkName = name.trim() !== "";
-  const checkEmail = email.includes("@");
-  //encrypt password
-  const hashedPassword = await bcrypt.hash(password, 5);
-  // check if the email is already in use
-  const emailUsed = await isEmailUsed(email);
-  if (checkName && checkEmail && !emailUsed) {
-    // firstly store the photo in the database to get its id
-    const addImage = `INSERT INTO Image (data,mime) VALUES (?,?)`;
-    const image = await sqlController.queryDataBase(addImage, [
-      photo.buffer,
-      photo.mimetype,
-    ]);
-    // insert the user in the DB using the photo id
-    const sqlQuery = `INSERT INTO User (username,email,password,photo) VALUES (?,?,?,?);`;
-    const ret = await sqlController.queryDataBase(sqlQuery, [
-      name,
-      email,
-      hashedPassword,
-      image.insertId,
-    ]);
-    return ret;
-  } else if (emailUsed) {
-    throw new Error("Email is already in use!");
-  } else {
-    throw new Error("Name can not be empty and email must contain a @");
-  }
+  if (!photo.mimetype.startsWith("image/")) throw new ValidationError("The profile picture must be an image");
+  if (await isUsernameUsed(name)) throw new ValidationError("Username is already in use");
+  if (await isEmailUsed(email)) throw new ValidationError("Email is already in use");
+  const hashedPassword = await bcrypt.hash(password, 10);
+  // firstly store the photo in the database to get its id
+  const addImage = `INSERT INTO Image (data,mime) VALUES (?,?)`;
+  const image = await sqlController.queryDataBase(addImage, [
+    photo.buffer,
+    photo.mimetype,
+  ]);
+  // insert the user in the DB using the photo id
+  const sqlQuery = `INSERT INTO User (username,email,password,photo) VALUES (?,?,?,?);`;
+  const ret = await sqlController.queryDataBase(sqlQuery, [
+    name,
+    email,
+    hashedPassword,
+    image.insertId,
+  ]);
+  return ret;
 };
 
 const removeUser = async (name, email, password) => {

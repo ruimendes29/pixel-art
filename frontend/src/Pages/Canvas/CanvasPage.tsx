@@ -245,8 +245,11 @@ const CanvasPage = () => {
             canvasActions.setCanvasSize({ canvasSize: canvasInfo.size })
           );
           dispatchRedux(canvasActions.setCanvasName({ name: canvasInfo.name }));
+        } else {
+          // only a project with no saved image gets an empty one: saving here when
+          // there is one would upload a blank grid before the drawing has loaded
+          handleSaveCanvas();
         }
-        handleSaveCanvas();
         checkShared();
       }
     };

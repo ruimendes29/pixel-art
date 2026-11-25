@@ -52,7 +52,7 @@
 }
 
 .inputs {
-  margin-top: 4rem;
+  margin-top: 0;
   width: min(50vw, var(--form-width));
   display: flex;
   flex-direction: column;

@@ -1,3 +1,5 @@
+import { field } from "../../fields/validate";
+
 // Tag categories offered in the tag picker. "Custom" holds tags people type in.
 export const PRESET_TAGS = new Map<string, string[]>([
   ["Anime", ["Naruto", "Pokemon", "Death Note", "Doraemon"]],
@@ -7,8 +9,8 @@ export const PRESET_TAGS = new Map<string, string[]>([
 ]);
 export const CUSTOM_CATEGORY = "Custom";
 
-// Same limit as Tag.name in backend/schema.sql
-export const MAX_TAG_LENGTH = 50;
+// From the shared field rules (fields/fields.json), which the backend applies too
+export const MAX_TAG_LENGTH = field("tag").maxLength!;
 
 const ALL_PRESETS = Array.from(PRESET_TAGS.values()).flat();
 

@@ -5,6 +5,7 @@ import ReactDOM from "react-dom";
 import Button from "../../components/UI/Button";
 import Modal from "../../components/UI/Modal";
 
+import { field } from "../../fields/validate";
 import classes from "./FilterModal.module.css";
 import {
   CUSTOM_CATEGORY,
@@ -146,7 +147,12 @@ const FilterModal = (props: any) => {
               </Fragment>
             )}
             {choseTags && (
-              <textarea ref={textRef} className={`${classes.textarea}`} />
+              <textarea
+                ref={textRef}
+                className={`${classes.textarea}`}
+                aria-label={field("description").label}
+                maxLength={field("description").maxLength}
+              />
             )}
           </div>
           {props.toShare && (

@@ -1,11 +1,11 @@
-import React, { Fragment, useEffect, useState } from "react";
-import classes from "./Project.module.css";
+import React, { useEffect, useState } from "react";
+import card from "../../components/UI/ArtCard.module.css";
 import noImage from "../../assets/images/no-image.png";
 import useHttp, { COMMON_URL } from "../../hooks/use-http";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 
-const Project = (props: { id: number; name: string; onClick:Function }) => {
+const Project = (props: { id: number; name: string; onClick: Function }) => {
   const [image, setImage] = useState(noImage);
   const [httpInfo, sendHttpReq] = useHttp();
 
@@ -23,20 +23,16 @@ const Project = (props: { id: number; name: string; onClick:Function }) => {
   }, [sendHttpReq, props.id]);
 
   return (
-    <div onClick={()=>props.onClick()} className={`${classes.project}`}>
-      {httpInfo.isLoading && (
-        <div className={`${classes.overlay}`}>
-          <FontAwesomeIcon className="fa-spin" icon={faCircleNotch} />{" "}
-        </div>
+    <button type="button" onClick={() => props.onClick()} className={card.card}>
+      {httpInfo.isLoading ? (
+        <span className={card.thumb}>
+          <FontAwesomeIcon className="fa-spin" icon={faCircleNotch} />
+        </span>
+      ) : (
+        <img className={card.thumb} src={image} alt="" />
       )}
-      {!httpInfo.isLoading && (
-        <Fragment>
-          {" "}
-          <img src={image} alt="" />
-          <p>{props.name}</p>
-        </Fragment>
-      )}
-    </div>
+      <span className={card.name}>{props.name}</span>
+    </button>
   );
 };
 

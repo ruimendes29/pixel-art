@@ -1,50 +1,43 @@
 .projects {
-  width: 90vw;
+  width: min(90vw, 72rem);
   margin: 0 auto;
-  margin-top: 5vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 2.5rem 0 3rem;
 }
 
-.btn {
-  margin: 0 auto;
-  width: fit-content;
-  padding: 0.5rem 3rem;
-  margin-bottom: 1rem;
+/* Page title on the left, actions on the right; wraps on phones */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* .buttons .btn beats Button's own full-width .btn */
+.buttons .btn {
+  width: auto;
+  padding: 0.6rem 1.25rem;
+  font-weight: 600;
 }
 
 .icon {
-  margin-left: 1rem;
+  margin-left: 0.6rem;
 }
 
-.projects-holder {
-  display: grid;
-  width: 100%;
-  gap: 1rem;
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.no-project{
-  grid-column: 1/5;
-  margin: 0 auto;
-  margin-top: 2rem;
-  font-size: var(--fs-lg);
-  color: var(--primary-color);
-  text-align: center;
-}
-
-.buttons{
-  display: flex;
-  gap:1rem;
-}
-
-.group-button{
+.group-button {
   margin-top: 1rem;
-}
-
-@media screen and (max-width: 40em) {
-  .projects-holder {
-    grid-template-columns:1fr 1fr;
-  }
 }

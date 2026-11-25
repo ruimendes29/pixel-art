@@ -236,7 +236,7 @@ test("the cursor is a hand while panning, also when holding space", async ({ pag
 test("the theme follows the system's dark mode", async ({ page }) => {
   const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
   await page.emulateMedia({ colorScheme: "light" });
-  await expect.poll(bg).toBe("rgb(255, 255, 255)");
+  await expect.poll(bg).toBe("rgb(242, 247, 247)");
   await page.emulateMedia({ colorScheme: "dark" });
   await expect.poll(bg).toBe("rgb(15, 26, 26)");
 });

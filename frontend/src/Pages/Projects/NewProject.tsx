@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from "react";
 import Input from "../../components/UI/Input";
 import classes from "./NewProject.module.css";
-import useInput from "../../hooks/use-input";
+import useField from "../../fields/use-field";
 import useHttp, { COMMON_URL } from "../../hooks/use-http";
 import Button from "../../components/UI/Button";
 import Select from "../../dropdown/Select";
@@ -26,7 +26,7 @@ const NewProject = () => {
         });
         console.log(groupsFromDB);
         setSelectedGroup(
-          groupsFromDB.length > 0 ? groupsFromDB[0].id : undefined
+          groupsFromDB.length > 0 ? groupsFromDB[0].id : undefined,
         );
         setGroups(groupsFromDB);
       };
@@ -35,10 +35,8 @@ const NewProject = () => {
     }
   }, [sendRequest]);
 
-  const sizeInput = useInput((v: number) => {
-    return v >= 10 && v <= 100;
-  });
-  const nameInput = useInput((name: string) => name.trim() !== "");
+  const sizeInput = useField("canvasSize");
+  const nameInput = useField("projectName");
   return (
     <form className={`${classes.form}`}>
       <Input
@@ -46,8 +44,9 @@ const NewProject = () => {
         onChange={nameInput.valueChanged}
         value={nameInput.enteredValue}
         onBlur={nameInput.touchedHandler}
-        name="Project name"
-        error="Name can not be empty!"
+        name={nameInput.label}
+        maxLength={nameInput.maxLength}
+        error={nameInput.error}
       />
       <Input
         invalid={sizeInput.isInputInvalid}
@@ -55,8 +54,8 @@ const NewProject = () => {
         value={sizeInput.enteredValue}
         onBlur={sizeInput.touchedHandler}
         type="number"
-        name="Canvas size"
-        error="Canvas size must be atleast 10 and less than 100"
+        name={sizeInput.label}
+        error={sizeInput.error}
       />
       {localStorage.getItem("token") && (
         <Fragment>
@@ -77,7 +76,10 @@ const NewProject = () => {
                 label="Group"
                 labelClassName={classes["group-label"]}
                 value={selectedGroup}
-                options={groups.map((g: any) => ({ value: g.id as number, label: g.name }))}
+                options={groups.map((g: any) => ({
+                  value: g.id as number,
+                  label: g.name,
+                }))}
                 onChange={(id: number) => setSelectedGroup(id)}
               />
               <Button
@@ -97,32 +99,32 @@ const NewProject = () => {
       <Button
         onClick={async (e: any) => {
           e.preventDefault();
-          if (!sizeInput.isInputInvalid && !nameInput.isInputInvalid) {
-            dispatchRedux(
-              canvasActions.setCanvasSize({
-                canvasSize: sizeInput.enteredValue,
-              })
-            );
-            dispatchRedux(
-              canvasActions.setCanvasName({ name: nameInput.enteredValue })
-            );
-            if (localStorage.getItem("token")) {
-              const token = localStorage.getItem("token")!;
-              const s = await sendRequest({
-                url: `${COMMON_URL}/art/add-project`,
-                method: "POST",
-                body: JSON.stringify({
-                  token,
-                  name: nameInput.enteredValue,
-                  size: sizeInput.enteredValue,
-                  description: "asoidj",
-                  group: groupEnabled ? selectedGroup! : null,
-                }),
-                headers: { "Content-Type": "application/json" },
-              });
-              navigate(`/canvas/${s.id}`);
-            } else navigate(`/canvas/null`);
+          // untouched fields count too: show their messages instead of creating
+          if (!sizeInput.isValueValid || !nameInput.isValueValid) {
+            sizeInput.touchedHandler();
+            nameInput.touchedHandler();
+            return;
           }
+          const name = nameInput.enteredValue.trim();
+          const size = Number(sizeInput.enteredValue);
+          dispatchRedux(canvasActions.setCanvasSize({ canvasSize: size }));
+          dispatchRedux(canvasActions.setCanvasName({ name }));
+          if (localStorage.getItem("token")) {
+            const token = localStorage.getItem("token")!;
+            const s = await sendRequest({
+              url: `${COMMON_URL}/art/add-project`,
+              method: "POST",
+              body: JSON.stringify({
+                token,
+                name,
+                size,
+                description: "",
+                group: groupEnabled ? selectedGroup! : null,
+              }),
+              headers: { "Content-Type": "application/json" },
+            });
+            navigate(`/canvas/${s.id}`);
+          } else navigate(`/canvas/null`);
         }}
         primary
       >

@@ -17,7 +17,7 @@ const SimpleNavBar = () => {
           className={`${classes.btn}`}
           secondary
         >
-          Register
+          Create account
         </Button>
         <Button
           onClick={() => {
@@ -26,7 +26,7 @@ const SimpleNavBar = () => {
           className={`${classes.btn}`}
           primary
         >
-          Login
+          Log in
         </Button>
       </li>
     </Fragment>

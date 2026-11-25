@@ -6,18 +6,15 @@ import AvatarCropModal from "../../components/UI/AvatarCropModal";
 import Button from "../../components/UI/Button";
 import Input from "../../components/UI/Input";
 import PasswordMeter from "../../components/UI/PasswordMeter";
-import { isPasswordStrong } from "../../components/UI/password-rules";
 import useHttp, { COMMON_URL } from "../../hooks/use-http";
-import useInput from "../../hooks/use-input";
+import useField from "../../fields/use-field";
 import classes from "./Register.module.css";
 
 const Register = () => {
-  const nameInput = useInput((el: string) => el.trim() !== "");
+  const nameInput = useField("username");
   const [httpInfo, sendHttp] = useHttp();
-  const passwordInput = useInput(isPasswordStrong);
-  const emailInput = useInput((el: string) => {
-    return el.includes("@");
-  });
+  const passwordInput = useField("password");
+  const emailInput = useField("email");
 
   const navigate = useNavigate();
 
@@ -66,8 +63,9 @@ const Register = () => {
           onChange={nameInput.valueChanged}
           value={nameInput.enteredValue}
           onBlur={nameInput.touchedHandler}
-          name="Username"
-          error="Name can not be empty!"
+          name={nameInput.label}
+          maxLength={nameInput.maxLength}
+          error={nameInput.error}
         />
         <Input
           className={`${classes.ipt}`}
@@ -75,7 +73,8 @@ const Register = () => {
           onChange={passwordInput.valueChanged}
           value={passwordInput.enteredValue}
           onBlur={passwordInput.touchedHandler}
-          name="Password"
+          name={passwordInput.label}
+          maxLength={passwordInput.maxLength}
           type="password"
         />
         <PasswordMeter value={passwordInput.enteredValue} />
@@ -85,20 +84,19 @@ const Register = () => {
           onChange={emailInput.valueChanged}
           value={emailInput.enteredValue}
           onBlur={emailInput.touchedHandler}
-          error={
-            httpInfo.error ? httpInfo.error.message : `Email must contain a @`
-          }
-          name="Email"
+          error={httpInfo.error ? httpInfo.error.message : emailInput.error}
+          name={emailInput.label}
+          maxLength={emailInput.maxLength}
           type="email"
         />
         <Button
           onClick={handleRegister}
           disabled={!isFormValid}
           className={`${classes.btn}`}
-          secondary
+          primary
         >
           {!httpInfo.isLoading ? (
-            "Register"
+            "Create account"
           ) : (
             <FontAwesomeIcon className="fa-spin" icon={faCircleNotch} />
           )}
@@ -134,9 +132,7 @@ const Register = () => {
         }`}
       >
         {!photo && <div>Upload an Image</div>}
-        {photo && (
-          <img src={photoUrl} alt="Your profile" />
-        )}
+        {photo && <img src={photoUrl} alt="Your profile" />}
       </div>
     </div>
   );

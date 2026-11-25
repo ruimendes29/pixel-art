@@ -1,22 +1,3 @@
-.post-holder{
-    justify-self: center;
-    text-align: center;
-    color: var(--primary-color,black);
-    font-size: var(--fs-base);
-    font-weight: 400;
-    background-color: var(--surface);
-}
-
-.post-holder:hover{
-    filter: brightness(90%);
-    cursor: pointer;
-}
-
-.img{
-    width: 100%;
-    aspect-ratio: 1/1;
-}
-
 .modal{
     color: var(--primary-color,black);
     width: 70vw;
@@ -28,6 +9,7 @@
 .modal-img{
     width: min(90%,85vh);
     align-self: center;
+    image-rendering: pixelated;
 }
 .left{
     display: flex;

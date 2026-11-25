@@ -2,6 +2,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import Modal from "../../../components/UI/Modal";
 import LikeCounter from "./LikeCounter";
+import card from "../../../components/UI/ArtCard.module.css";
 import classes from "./Post.module.css";
 import noImage from "../../../assets/images/no-image.png";
 import useHttp, { COMMON_URL } from "../../../hooks/use-http";
@@ -16,7 +17,7 @@ const Post = (props: {
   const [showPost, setShowPost] = useState(false);
   const [userInfo, setUserInfo]: [
     { image: any; name: undefined | string },
-    Function
+    Function,
   ] = useState({ image: noImage, name: undefined });
   const [postImage, setPostImage] = useState(noImage);
   const [, sendHttpRequest] = useHttp();
@@ -51,17 +52,22 @@ const Post = (props: {
       });
     };
     const fetchLikeInfo = async () => {
-      const likes = (await sendHttpRequest({
-        url: `${COMMON_URL}/likes/number/${props.postId}`,
-        headers: { "Content-Type": "application/json" },
-      }))?.likes ?? 0;
+      const likes =
+        (
+          await sendHttpRequest({
+            url: `${COMMON_URL}/likes/number/${props.postId}`,
+            headers: { "Content-Type": "application/json" },
+          })
+        )?.likes ?? 0;
       if (localStorage.getItem("token")) {
-        const liked = !!(await sendHttpRequest({
-          url: `${COMMON_URL}/likes/liked/${
-            props.postId
-          }?key=${localStorage.getItem("token")}`,
-          headers: { "Content-Type": "application/json" },
-        }))?.liked;
+        const liked = !!(
+          await sendHttpRequest({
+            url: `${COMMON_URL}/likes/liked/${
+              props.postId
+            }?key=${localStorage.getItem("token")}`,
+            headers: { "Content-Type": "application/json" },
+          })
+        )?.liked;
         setLikesInfo({ liked, numberOfLikes: likes });
       } else {
         setLikesInfo({ liked: false, numberOfLikes: likes });
@@ -76,7 +82,7 @@ const Post = (props: {
     if (likesInfo.liked) {
       await sendHttpRequest({
         url: `${COMMON_URL}/likes/${props.postId}?key=${localStorage.getItem(
-          "token"
+          "token",
         )}`,
         method: "DELETE",
       });
@@ -101,17 +107,14 @@ const Post = (props: {
 
   return (
     <Fragment>
-      <div
+      <button
+        type="button"
         onClick={() => setShowPost(true)}
-        className={`${classes["post-holder"]}`}
+        className={card.card}
       >
-        <img
-          className={`${classes.img}`}
-          src={postImage}
-          alt={props.postDescription}
-        />
-        <p>{props.postName}</p>
-      </div>
+        <img className={card.thumb} src={postImage} alt="" />
+        <span className={card.name}>{props.postName}</span>
+      </button>
       {showPost &&
         ReactDOM.createPortal(
           <Modal
@@ -125,7 +128,7 @@ const Post = (props: {
                 alt={props.postDescription}
               />
               <LikeCounter
-                likable={localStorage.getItem("token")?true:false}
+                likable={localStorage.getItem("token") ? true : false}
                 liked={likesInfo.liked}
                 onLike={() => {
                   if (localStorage.getItem("token")) handleLikePressed();
@@ -150,7 +153,7 @@ const Post = (props: {
               </div>
             </div>
           </Modal>,
-          document.getElementById("post-modal")!
+          document.getElementById("post-modal")!,
         )}
     </Fragment>
   );

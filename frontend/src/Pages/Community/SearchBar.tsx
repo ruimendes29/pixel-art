@@ -1,6 +1,7 @@
 import { faMagnifyingGlass, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
+import { field } from "../../fields/validate";
 import classes from "./SearchBar.module.css";
 
 // Searches as you type; the magnifier turns into a button that clears the search.
@@ -11,7 +12,7 @@ const SearchBar = (props: { value: string; onChange: (value: string) => void }) 
         type="search"
         aria-label="Search posts"
         placeholder="Search by name or description"
-        maxLength={100}
+        maxLength={field("search").maxLength}
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
         onKeyDown={(e) => {

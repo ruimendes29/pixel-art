@@ -37,7 +37,7 @@ const mockApi = async (page: Page) => {
 };
 
 const lastQuery = () => queries[queries.length - 1];
-const posts = (page: Page) => page.locator("p").filter({ hasText: /^(Tiny cat|Arcade|Porto)$/ });
+const posts = (page: Page) => page.locator("button span").filter({ hasText: /^(Tiny cat|Arcade|Porto)$/ });
 
 const openCommunity = async (page: Page) => {
   await mockApi(page);
@@ -102,11 +102,11 @@ test.describe("tags", () => {
     await page.getByRole("button", { name: "Filter by tags" }).click();
     await page.getByRole("button", { name: "Cities" }).click();
 
-    await page.getByRole("button", { name: "Porto", exact: true }).click();
+    await page.locator("#filter-modal").getByRole("button", { name: "Porto", exact: true }).click();
     await expect.poll(() => lastQuery().tags).toEqual(["Porto"]);
     await expect(posts(page)).toHaveText(["Porto"]);
 
-    await page.getByRole("button", { name: "Porto", exact: true }).click();
+    await page.locator("#filter-modal").getByRole("button", { name: "Porto", exact: true }).click();
     await expect.poll(() => lastQuery().tags).toEqual([]);
 
     await page.getByRole("button", { name: "Add all" }).click();
