@@ -1,16 +1,17 @@
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { Dropdown, DropdownItem } from "../../../dropdown/Dropdown";
 import useHttp, { COMMON_URL } from "../../../hooks/use-http";
 import { userManagementActions } from "../../../store/redux-store";
-import Button from "../Button";
 import classes from "./NavbarPic.module.css";
 import guestImage from "../../../assets/images/guest.png";
 
+// Avatar in the navbar; clicking it opens the account menu
 const NavbarPic = () => {
   const [photo, setPhoto]: [any, any] = useState(undefined);
   const [, sendHttpRequest] = useHttp();
-  const [subMenuOpened, setSubMenuOpened] = useState(false);
   const navigate = useNavigate();
   const dispatchRedux = useDispatch();
   useEffect(() => {
@@ -34,28 +35,23 @@ const NavbarPic = () => {
   }, [sendHttpRequest]);
 
   return (
-    <div
-      onClick={() => {
-        setSubMenuOpened((o) => !o);
-      }}
-      className={`${classes["img-holder"]}`}
+    <Dropdown
+      label="Account menu"
+      placement="bottom-end"
+      triggerClassName={classes["img-holder"]}
+      trigger={<img src={photo} alt="" />}
     >
-      <img src={photo} alt="" />
-      {subMenuOpened && (
-        <div className={`${classes["menu-buttons"]}`}>
-          <Button
-            onClick={() => {
-              dispatchRedux(userManagementActions.handleLogout());
-              localStorage.removeItem("token");
-              navigate("/home");
-            }}
-            secondary
-          >
-            Logout
-          </Button>{" "}
-        </div>
-      )}
-    </div>
+      <DropdownItem
+        icon={faRightFromBracket}
+        onSelect={() => {
+          dispatchRedux(userManagementActions.handleLogout());
+          localStorage.removeItem("token");
+          navigate("/home");
+        }}
+      >
+        Logout
+      </DropdownItem>
+    </Dropdown>
   );
 };
 

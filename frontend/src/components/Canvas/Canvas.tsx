@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { canvasActions } from "../../store/redux-store";
+import { onThemeChange } from "../../theme/theme";
+import { isTypingTarget } from "./shortcuts";
 import classes from "./Canvas.module.css";
 import {
   adjustcanvasWindowSize,
@@ -77,18 +79,6 @@ let lastPointSaved = { x: 0, y: 0 };
 let moved = { x: 0, y: 0 };
 let scrolled = 0;
 
-let spacePressed = false;
-
-document.addEventListener("keydown", (event) => {
-  if (event.code === "Space") {
-    spacePressed = true; //whatever you want to do when space is pressed
-  }
-});
-document.addEventListener("keyup", (event) => {
-  if (event.code === "Space") {
-    spacePressed = false; //whatever you want to do when space is pressed
-  }
-});
 
 const Canvas = React.forwardRef((props: any, ref: any) => {
   //from redux
@@ -103,6 +93,37 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
 
   const [mousePressed, setMousePressed]: [number | undefined, any] =
     useState(undefined);
+  const [spacePressed, setSpacePressed] = useState(false);
+
+  // Holding space turns the cursor into a hand and pans instead of painting
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.code !== "Space" || isTypingTarget(e.target)) return;
+      e.preventDefault(); // don't scroll the page or press a focused button
+      if (!e.repeat) setSpacePressed(true);
+    };
+    const up = (e: KeyboardEvent) => {
+      if (e.code === "Space") setSpacePressed(false);
+    };
+    const reset = () => setSpacePressed(false);
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
+    window.addEventListener("blur", reset);
+    return () => {
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
+      window.removeEventListener("blur", reset);
+    };
+  }, []);
+
+  // Redraw the grid when the theme changes (user's choice or the OS)
+  useEffect(
+    () =>
+      onThemeChange(() =>
+        dispatch({ type: "RESIZE", newSize: canvasWindowSize / canvasSize })
+      ),
+    [canvasSize]
+  );
   const [canvasInfo, dispatch] = useReducer(
     reducer,
     getInitialCanvas(canvasWindowSize)
@@ -223,8 +244,9 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
     const limit = 5;
     const velocity = 0.3;
     const zoomedSquaredSize = canvasInfo.squareSize * canvasInfo.zoom;
-    //sliding right (from left to right)
-    if (e.screenX >= lastPointSaved.x + limit) {
+    // The drawing follows the pointer, like dragging a sheet of paper:
+    // pointer moves left -> drawing moves left (reveals what's on the right)
+    if (e.screenX <= lastPointSaved.x - limit) {
       const colsInScreen = canvasWindowSize / zoomedSquaredSize;
       if (Math.abs(moved.x - velocity) + colsInScreen < canvasSize) {
         dispatchPanned(e, { x: -velocity, y: 0 });
@@ -239,8 +261,8 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
         );
       }
     }
-    //sliding left (from right to left)
-    if (e.screenX <= lastPointSaved.x - limit) {
+    // pointer moves right -> drawing moves right
+    if (e.screenX >= lastPointSaved.x + limit) {
       if (moved.x + velocity < 0) {
         dispatchPanned(e, { x: velocity, y: 0 });
       } else if (moved.x < 0) {
@@ -248,7 +270,8 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
       }
     }
 
-    if (e.screenY >= lastPointSaved.y + limit) {
+    // pointer moves up -> drawing moves up
+    if (e.screenY <= lastPointSaved.y - limit) {
       const rowsInScreen = canvasWindowSize / zoomedSquaredSize;
       if (Math.abs(moved.y - velocity) + rowsInScreen < canvasSize) {
         dispatchPanned(e, { y: -velocity, x: 0 });
@@ -263,7 +286,8 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
         );
       }
     }
-    if (e.screenY <= lastPointSaved.y - limit) {
+    // pointer moves down -> drawing moves down
+    if (e.screenY >= lastPointSaved.y + limit) {
       if (moved.y + velocity < 0) {
         dispatchPanned(e, { y: velocity, x: 0 });
       } else if (moved.y < 0) {
@@ -305,7 +329,9 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
   };
 
   const handleMousePressed = (e: any) => {
-    lastPointSaved = { x: e.clientX, y: e.clientY };
+    if (e.button === 1) e.preventDefault(); // no autoscroll icon, we pan instead
+    // screen coordinates, like handlePanning compares against
+    lastPointSaved = { x: e.screenX, y: e.screenY };
     const canvas: HTMLCanvasElement = ref.current!;
     const { x, y } = getMousePos(canvas, e);
     if (pickingColor) dispatchRedux(canvasActions.changePickingColor());
@@ -383,9 +409,19 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
     setMousePressed(e.button);
   };
 
+  const panReady = spacePressed || isPanning;
+  const panningNow =
+    mousePressed === 1 || (mousePressed === 0 && panReady);
+  const cursorClass = panningNow
+    ? classes.panning
+    : panReady
+    ? classes["pan-ready"]
+    : "";
+
   return (
     <div className={`${classes["canvas-holder"]}`}>
       <div className={`${classes.name}`}>{canvasName}</div>
+      <div className={classes.frame}>
       <canvas
         onMouseLeave={() => {
           setMousePressed(undefined);
@@ -408,12 +444,15 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
           }
         }}
         ref={ref}
-        className={`${classes.canvas}`}
+        className={`${classes.canvas} ${cursorClass}`}
         id="myCanvas"
         aria-label="Drawing canvas"
         width={canvasWindowSize}
         height={canvasWindowSize}
       />
+      {/* Controls anchored to the canvas edges, e.g. the reference image button */}
+      {props.children}
+      </div>
     </div>
   );
 });

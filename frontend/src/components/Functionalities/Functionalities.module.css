@@ -7,14 +7,14 @@
   max-width: min(100%, 60rem);
   padding: 0.5rem 0.75rem;
   border-radius: 1rem;
-  background-color: white;
-  box-shadow: 0 6px 20px rgba(31, 59, 59, 0.15);
+  background-color: var(--surface);
+  box-shadow: 0 6px 20px var(--shadow-soft);
 }
 
 .divider {
   align-self: stretch;
   width: 1px;
-  background-color: rgba(59, 191, 191, 0.3);
+  background-color: var(--primary-line);
 }
 
 @media screen and (max-width: 40em) {

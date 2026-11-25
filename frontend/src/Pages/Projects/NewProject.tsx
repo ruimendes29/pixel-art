@@ -4,6 +4,7 @@ import classes from "./NewProject.module.css";
 import useInput from "../../hooks/use-input";
 import useHttp, { COMMON_URL } from "../../hooks/use-http";
 import Button from "../../components/UI/Button";
+import Select from "../../dropdown/Select";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { canvasActions } from "../../store/redux-store";
@@ -72,28 +73,13 @@ const NewProject = () => {
           )}
           {groupEnabled && (
             <div className={`${classes["group-input"]}`}>
-              <label className={`${classes["group-label"]}`} htmlFor="groups">
-                Group
-              </label>
-              <select
-                onChange={(e) => {
-                  console.log(selectedGroup);
-                  setSelectedGroup(+e.target.value);
-                  console.log(e.target.value);
-                }}
-                id="groups"
-                className={`${classes.groups}`}
-              >
-                {groups.map((g: any) => (
-                  <option
-                    className={`${classes.group}`}
-                    key={g.id}
-                    value={g.id}
-                  >
-                    {g.name}
-                  </option>
-                ))}
-              </select>
+              <Select
+                label="Group"
+                labelClassName={classes["group-label"]}
+                value={selectedGroup}
+                options={groups.map((g: any) => ({ value: g.id as number, label: g.name }))}
+                onChange={(id: number) => setSelectedGroup(id)}
+              />
               <Button
                 onClick={(e: any) => {
                   e.preventDefault();

@@ -16,21 +16,21 @@
 
 .primary {
     background-color: var(--primary-color);
-    color: white;
+    color: var(--on-primary);
 }
 
 .secondary {
-    background-color: white;
+    background-color: var(--surface);
     color: var(--primary-color);
     outline-offset: -2px;
     outline: 2px solid var(--primary-color);
 }
 
 .disabled{
-    background-color: lightgray;
+    background-color: var(--disabled-bg);
     outline-offset: -2px;
-    outline: 2px solid rgb(60, 60, 60);
-    color: rgb(60, 60, 60);
+    outline: 2px solid var(--text-strong);
+    color: var(--text-strong);
     cursor:not-allowed;
 }
 

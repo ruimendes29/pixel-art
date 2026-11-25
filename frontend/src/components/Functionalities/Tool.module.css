@@ -35,7 +35,7 @@
 
 .tool[aria-pressed="true"] {
   background-color: var(--primary-color);
-  color: white;
+  color: var(--on-primary);
 }
 
 .tool:disabled {

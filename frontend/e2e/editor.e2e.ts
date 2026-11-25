@@ -183,6 +183,155 @@ test("a reference image is set behind the canvas and can be removed", async ({ p
   await expect(page.getByRole("button", { name: "Add reference image" })).toBeVisible();
 });
 
+test("the reference image button sits outside the canvas's top-right corner", async ({ page }) => {
+  const box = (await canvas(page).boundingBox())!;
+  const button = (await page.getByRole("button", { name: "Add reference image" }).boundingBox())!;
+
+  expect(button.x).toBeGreaterThanOrEqual(box.x + box.width);
+  expect(Math.abs(button.y - box.y)).toBeLessThan(4);
+});
+
+test("the reference image button explains itself in a tooltip", async ({ page }) => {
+  const button = page.getByRole("button", { name: "Add reference image" });
+  const tooltip = page.getByRole("tooltip");
+
+  await button.hover();
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip).toContainText("behind the grid");
+  await expect(button).toHaveAttribute("aria-describedby", "app-tooltip");
+
+  await page.keyboard.press("Escape");
+  await expect(tooltip).toBeHidden();
+  await expect(button).not.toHaveAttribute("aria-describedby", /app-tooltip/);
+});
+
+test("the cursor is a hand while panning, also when holding space", async ({ page }) => {
+  const cursor = () => canvas(page).evaluate((c) => getComputedStyle(c).cursor);
+  const { x, y } = (await canvas(page).boundingBox())!;
+  expect(await cursor()).not.toMatch(/grab/);
+
+  // Space held: open hand, closed hand while dragging
+  await page.keyboard.down("Space");
+  await expect.poll(cursor).toBe("grab");
+  await page.mouse.move(x + 50, y + 50);
+  await page.mouse.down();
+  await expect.poll(cursor).toBe("grabbing");
+  await page.mouse.up();
+  await page.keyboard.up("Space");
+  await expect.poll(cursor).not.toMatch(/grab/);
+
+  // Move tool selected: same hand without the keyboard
+  await page.getByRole("button", { name: "Move canvas" }).click();
+  await expect.poll(cursor).toBe("grab");
+});
+
+test("the theme follows the system's dark mode", async ({ page }) => {
+  const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect.poll(bg).toBe("rgb(255, 255, 255)");
+  await page.emulateMedia({ colorScheme: "dark" });
+  await expect.poll(bg).toBe("rgb(15, 26, 26)");
+});
+
+test("keyboard shortcuts switch tools, but not while typing", async ({ page }) => {
+  await page.keyboard.press("e");
+  await expect(page.getByRole("button", { name: "Eraser", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await page.keyboard.press("h");
+  await expect(page.getByRole("button", { name: "Move canvas" })).toHaveAttribute("aria-pressed", "true");
+  await page.keyboard.press("b");
+  await expect(page.getByRole("button", { name: "Brush", exact: true })).toHaveAttribute("aria-pressed", "true");
+
+  await page.getByRole("button", { name: "Current colour" }).click();
+  await page.getByLabel("hex").press("e");
+  await expect(page.getByRole("button", { name: "Brush", exact: true })).toHaveAttribute("aria-pressed", "true");
+});
+
+test("the shortcuts sidebar sits left of the canvas and remembers being collapsed", async ({ page }) => {
+  const tab = page.getByRole("button", { name: "Keyboard shortcuts" });
+  const list = page.locator("#shortcuts-list");
+  const box = (await canvas(page).boundingBox())!;
+
+  await expect(list).toBeVisible();
+  await expect(list).toContainText("Eraser");
+  const listBox = (await list.boundingBox())!;
+  expect(listBox.x + listBox.width).toBeLessThanOrEqual(box.x);
+
+  await tab.hover();
+  await expect(page.getByRole("tooltip")).toContainText("Hide the keyboard shortcuts");
+
+  await tab.click();
+  await expect(list).toBeHidden();
+  await expect(tab).toHaveAttribute("aria-expanded", "false");
+  const tabBox = (await tab.boundingBox())!;
+  expect(tabBox.x + tabBox.width).toBeLessThanOrEqual(box.x);
+
+  await page.mouse.move(0, 0);
+  await tab.hover();
+  await expect(page.getByRole("tooltip")).toContainText("keys for the tools");
+
+  // Still collapsed on the next visit to the editor
+  expect(await page.evaluate(() => localStorage.getItem("shortcuts-panel-open"))).toBe("false");
+});
+
+test("the shortcuts tab stays in the same place open or closed", async ({ page }) => {
+  const tab = page.getByRole("button", { name: "Keyboard shortcuts" });
+  const open = (await tab.boundingBox())!;
+  await tab.click();
+  await expect(tab).toHaveAttribute("aria-expanded", "false");
+  expect(await tab.boundingBox()).toEqual(open);
+  await tab.click();
+  await expect(tab).toHaveAttribute("aria-expanded", "true");
+  expect(await tab.boundingBox()).toEqual(open);
+});
+
+test("the shortcuts card keeps its border after switching from dark to light", async ({ page }) => {
+  const border = () =>
+    page.locator("#shortcuts-list").evaluate((el) => {
+      const s = getComputedStyle(el);
+      return `${s.borderTopWidth} ${s.borderTopStyle} ${s.borderTopColor}`;
+    });
+  await page.getByRole("button", { name: "Dark theme" }).click();
+  await expect.poll(border).toMatch(/^1px solid rgba\(220, 235, 235/);
+  await page.getByRole("button", { name: "Light theme" }).click();
+  await expect.poll(border).toMatch(/^1px solid rgba\(31, 59, 59/);
+});
+
+test("dragging moves the drawing the same way as the pointer", async ({ page }) => {
+  await setColour(page, "#ff0000");
+  await clickCell(page, 5, 5);
+  const box = (await canvas(page).boundingBox())!;
+  const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+
+  // Zoom in so there is room to pan
+  await page.mouse.move(centre.x, centre.y);
+  for (let i = 0; i < 6; i++) await page.mouse.wheel(0, -100);
+
+  // Average x of the red pixels on the canvas
+  const redX = () =>
+    canvas(page).evaluate((c: HTMLCanvasElement) => {
+      const { data, width } = c.getContext("2d")!.getImageData(0, 0, c.width, c.height);
+      let sum = 0;
+      let n = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        if (data[i] === 255 && data[i + 1] === 0 && data[i + 2] === 0) {
+          sum += (i / 4) % width;
+          n++;
+        }
+      }
+      return n ? sum / n : NaN;
+    });
+  const before = await redX();
+  expect(before).not.toBeNaN();
+
+  await page.keyboard.down("Space");
+  await page.mouse.down();
+  for (let dx = 10; dx <= 150; dx += 10) await page.mouse.move(centre.x + dx, centre.y);
+  await page.mouse.up();
+  await page.keyboard.up("Space");
+
+  await expect.poll(redX).toBeGreaterThan(before);
+});
+
 test("scrolling over the canvas doesn't scroll the page", async ({ page }) => {
   // Short viewport so the page itself can scroll
   await page.setViewportSize({ width: 390, height: 600 });

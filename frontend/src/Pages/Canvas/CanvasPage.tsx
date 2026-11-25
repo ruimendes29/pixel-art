@@ -18,6 +18,7 @@ import {
   paintStoredSquares,
   rgbToHex,
 } from "../../components/Canvas/CanvasOperations/canvas-utils";
+import ShortcutsPanel from "../../components/Canvas/ShortcutsPanel";
 import Functionalities from "../../components/Functionalities/Functionalities";
 import ReferenceImage from "../../components/Functionalities/ReferenceImage";
 import useHttp, { COMMON_URL } from "../../hooks/use-http";
@@ -265,8 +266,10 @@ const CanvasPage = () => {
       <div className={`${classes.under}`}>
         {isOwner && (
           <Fragment>
-            <ReferenceImage />
-            <Canvas ref={canvasRef} />
+            <Canvas ref={canvasRef}>
+              <ShortcutsPanel />
+              <ReferenceImage />
+            </Canvas>
             <Functionalities
                 saving={httpInfo.isLoading}
                 shared={isShared}

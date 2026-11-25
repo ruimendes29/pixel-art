@@ -1,14 +1,14 @@
 .counter{
     color: var(--primary-color,black);
     font-size: var(--fs-base);
-    background-color: white;
+    background-color: var(--surface);
     display: flex;
     justify-content: space-around;
     align-items: center;
     margin: 1rem auto;
     width: 30%;
     border-radius: 0.5rem;
-    box-shadow: 0 3px 10px 1px rgb(205, 205, 205);
+    box-shadow: 0 3px 10px 1px var(--shadow-neutral);
 }
 
 .not-clickable:hover{

@@ -1,18 +1,18 @@
 .btn {
   width: 100%;
   font-size: var(--fs-md);
-  max-width: 500px;
+  padding: 0.55rem 0;
 }
 
+/* Same column as the register form: full width on phones, capped on big screens */
 .inputs {
   margin-top: 4rem;
-  width: fit-content;
+  width: min(90vw, var(--form-width));
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
 }
 
 .inputs > * {
-  width: 60vw;
   margin-bottom: 2rem;
 }

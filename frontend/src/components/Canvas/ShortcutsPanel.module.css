@@ -1,0 +1,145 @@
+/* Sits outside the canvas's left edge (the canvas frame is the positioned
+   parent). The "?" tab sits on top of the card like a folder divider tab.
+   Rule: the tab keeps the exact same box in both states (only its bottom
+   border and corners change), so it never moves under the pointer. */
+.panel {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 1rem);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* 100% is the canvas width: never wider than the free space on its left */
+  width: min(16rem, calc((100vw - 100%) / 2 - 2rem));
+}
+
+/* Same width, height and margins open or closed */
+.tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 2.75rem;
+  height: 2.1rem;
+  margin: 0 0.75rem -1px 0;
+  padding: 0;
+  border: 1px solid var(--outline);
+  border-radius: 0.6rem 0.6rem 0 0;
+  background-color: var(--surface);
+  color: var(--primary-color);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  box-shadow: 0 -2px 6px var(--shadow-soft);
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+/* Open: no visible bottom border, so the tab and the card read as one piece
+   (the -1px margin lets the tab cover the card's top border under it) */
+.panel.open .tab {
+  border-bottom-color: var(--surface);
+}
+
+/* Closed: the tab stands alone, with all four corners rounded */
+.panel:not(.open) .tab {
+  border-radius: 0.6rem;
+  box-shadow: 0 1px 2px var(--shadow-soft), 0 4px 12px var(--shadow-soft);
+}
+
+.tab:hover,
+.tab:focus-visible {
+  outline: none;
+  background-color: var(--primary-color);
+  color: var(--on-primary);
+}
+
+.panel.open .tab:hover,
+.panel.open .tab:focus-visible {
+  border-bottom-color: var(--primary-color);
+}
+
+/* Focus ring drawn with box-shadow so it doesn't change the tab's box */
+.tab:focus-visible {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--primary-color);
+}
+
+/* Real border plus a light shadow: visible in both themes (a shadow alone
+   disappears on dark, and the old filter shadow wasn't repainted when the
+   theme changed) */
+.card {
+  align-self: stretch;
+  box-sizing: border-box;
+  padding: 0.9rem 1rem 1rem;
+  border: 1px solid var(--outline);
+  border-radius: 0.75rem;
+  background-color: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px var(--shadow-soft), 0 8px 24px var(--shadow-soft);
+}
+
+.card[hidden] {
+  display: none;
+}
+
+.title {
+  margin: 0 0 0.6rem;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--primary-color);
+  letter-spacing: 0.02em;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.45rem 0.75rem;
+  margin: 0;
+  font-size: var(--fs-xs);
+  align-items: center;
+}
+
+.list dd {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.keys {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.keys kbd {
+  min-width: 1.4rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.3rem;
+  border: 1px solid var(--outline);
+  border-bottom-width: 2px;
+  background-color: var(--primary-tint);
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-align: center;
+}
+
+.plus,
+.word {
+  color: var(--text-faint);
+}
+
+/* Phones and tablets: no room beside the canvas and usually no keyboard */
+@media screen and (max-width: 60em) {
+  .panel {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab {
+    transition: none;
+  }
+}

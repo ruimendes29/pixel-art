@@ -6,13 +6,12 @@
   font-weight: 500;
   font-size: var(--fs-lg);
   color: var(--primary-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-.groups {
-  font-size: var(--fs-sm);
-  width: 100%;
-  border-color: var(--primary-color);
-  background-color: white;
-  padding: 1rem 0.3rem;
-  color: var(--primary-color);
+.group-label {
+  display: block;
+  margin-bottom: 0.35rem;
 }

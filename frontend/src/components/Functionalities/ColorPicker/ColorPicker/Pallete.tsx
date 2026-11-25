@@ -17,7 +17,7 @@ const Pallete = (props: {
             disabled={!color}
             aria-label={color ? `Use colour ${color}` : "Empty palette slot"}
             onClick={() => props.onClickedColor(color)}
-            style={{ backgroundColor: color || "white" }}
+            style={{ backgroundColor: color || "var(--surface)" }}
             className={`${classes["color-holder"]}`}
           />
         );
