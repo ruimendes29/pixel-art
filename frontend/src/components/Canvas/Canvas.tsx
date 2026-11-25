@@ -14,6 +14,7 @@ import {
   getInitialCanvas,
   getMousePos,
   getPositionOnCanvas,
+  getReferenceOpacity,
   paintSquare,
   pickColor,
   rgbToHex,
@@ -88,7 +89,6 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
   const pickingColor = useSelector((state: any) => state.canvas.pickingColor);
   const activeBrush = useSelector((state: any) => state.canvas.brush);
   const background = useSelector((state: any) => state.canvas.background);
-  const [firstTimeBG, setFirstTimeBG] = useState(true);
   const dispatchRedux = useDispatch();
 
   const [mousePressed, setMousePressed]: [number | undefined, any] =
@@ -134,34 +134,12 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
     dispatch({ type: "FROM_MEMORY", size: canvasSize });
   }, [canvasSize]);
 
-  useEffect(() => {
-    if (!background) {
-      setFirstTimeBG(true);
-    }
-  }, [background]);
-
   const drawImage = useCallback(
     (ctx: any) => {
       const backgroundImage = new Image();
-
       backgroundImage.src = background;
-      if (firstTimeBG) {
-        backgroundImage.onload = () => {
-          ctx.globalAlpha = 0.3;
-          ctx.drawImage(
-            backgroundImage,
-            canvasInfo.startCol * canvasInfo.zoom * canvasInfo.squareSize,
-            canvasInfo.startRow * canvasInfo.zoom * canvasInfo.squareSize,
-            ctx.canvas.width * canvasInfo.zoom,
-            ctx.canvas.height * canvasInfo.zoom
-          );
-
-          ctx.globalAlpha = 1.0;
-          drawGrid(canvasInfo, ctx);
-          setFirstTimeBG(false);
-        };
-      } else {
-        ctx.globalAlpha = 0.3;
+      const draw = () => {
+        ctx.globalAlpha = getReferenceOpacity();
         ctx.drawImage(
           backgroundImage,
           canvasInfo.startCol * canvasInfo.zoom * canvasInfo.squareSize,
@@ -169,12 +147,14 @@ const Canvas = React.forwardRef((props: any, ref: any) => {
           ctx.canvas.width * canvasInfo.zoom,
           ctx.canvas.height * canvasInfo.zoom
         );
-
         ctx.globalAlpha = 1.0;
         drawGrid(canvasInfo, ctx);
-      }
+      };
+      // A new Image is not always decoded yet (e.g. redraw on theme change): wait for it
+      if (backgroundImage.complete) draw();
+      else backgroundImage.onload = draw;
     },
-    [background, firstTimeBG, canvasInfo]
+    [background, canvasInfo]
   );
 
   console.log(background);

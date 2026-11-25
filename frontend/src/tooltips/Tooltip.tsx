@@ -14,26 +14,28 @@ import "./tooltip.css";
 
 interface Props {
   content: string;
+  /** Extra tip shown under the content with a lightbulb. */
+  hint?: string;
   theme?: TooltipTheme;
   placement?: Placement;
   /** A single element (button, link…) that gets the events; it is not wrapped in another element. */
   children: ReactElement<HTMLAttributes<HTMLElement>>;
 }
 
-export function Tooltip({ content, theme = "default", placement = "top", children }: Props) {
+export function Tooltip({ content, hint, theme = "default", placement = "top", children }: Props) {
   const anchor = useRef<HTMLElement | null>(null);
 
   // The text changed while open (e.g. "Add reference image" -> "Change reference image").
   useEffect(
-    () => tooltips.update(anchor.current, content, { theme, placement, delayed: false }),
-    [content, theme, placement]
+    () => tooltips.update(anchor.current, content, { theme, placement, delayed: false, hint }),
+    [content, hint, theme, placement]
   );
   // The element went away while its tooltip was open.
   useEffect(() => () => tooltips.hide(anchor.current), []);
 
   const open = (el: HTMLElement, delayed: boolean) => {
     anchor.current = el;
-    tooltips.show(el, content, { theme, placement, delayed });
+    tooltips.show(el, content, { theme, placement, delayed, hint });
   };
 
   const p = children.props;

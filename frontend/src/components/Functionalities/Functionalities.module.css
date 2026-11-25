@@ -8,7 +8,8 @@
   padding: 0.5rem 0.75rem;
   border-radius: 1rem;
   background-color: var(--surface);
-  box-shadow: 0 6px 20px var(--shadow-soft);
+  /* tight + wide shadow: in light mode the white toolbar sits on a white page */
+  box-shadow: 0 1px 3px var(--shadow), 0 8px 24px var(--shadow-strong);
 }
 
 .divider {

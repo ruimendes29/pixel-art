@@ -66,6 +66,8 @@
   --canvas-bg: #ffffff;
   --canvas-border: #000000;
   --grid-line: #000000;
+  /* higher than dark: at 0.3 on the white canvas the image washes out */
+  --reference-opacity: 0.6;
 }
 
 /* Dark theme map */
@@ -102,6 +104,7 @@
   --canvas-bg: #1d2e2e;
   --canvas-border: #4d6a6a;
   --grid-line: #4d6a6a;
+  --reference-opacity: 0.3;
 }
 
 body {

@@ -79,6 +79,12 @@ export const getGridColor = () =>
     .getPropertyValue("--grid-line")
     .trim() || "black";
 
+// Reference image opacity comes from the theme (see --reference-opacity in index.css)
+export const getReferenceOpacity = () =>
+  Number(
+    getComputedStyle(document.documentElement).getPropertyValue("--reference-opacity")
+  ) || 0.3;
+
 export const drawGrid = (
   canvasInfo: {
     cols: number;

@@ -205,6 +205,14 @@ test("the reference image button explains itself in a tooltip", async ({ page })
   await expect(button).not.toHaveAttribute("aria-describedby", /app-tooltip/);
 });
 
+test("the eyedropper tooltip has a lightbulb hint about the reference image", async ({ page }) => {
+  await page.getByRole("button", { name: "Eyedropper" }).hover();
+  const hint = page.getByRole("tooltip").locator(".tooltip__hint");
+  await expect(hint).toBeVisible();
+  await expect(hint).toContainText("💡");
+  await expect(hint).toContainText("reference image");
+});
+
 test("the cursor is a hand while panning, also when holding space", async ({ page }) => {
   const cursor = () => canvas(page).evaluate((c) => getComputedStyle(c).cursor);
   const { x, y } = (await canvas(page).boundingBox())!;

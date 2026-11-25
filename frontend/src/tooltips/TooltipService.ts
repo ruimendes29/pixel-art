@@ -13,6 +13,8 @@ export interface TooltipOptions {
   theme: TooltipTheme;
   placement: Placement;
   delayed: boolean;
+  /** Optional tip shown under the text with a lightbulb. */
+  hint?: string;
 }
 
 export class TooltipService {
@@ -31,12 +33,22 @@ export class TooltipService {
   }
 
   /** Shows the tooltip next to `anchor` (or moves it there if it is open on another element). */
-  show(anchor: HTMLElement, text: string, { theme, placement, delayed }: TooltipOptions) {
+  show(anchor: HTMLElement, text: string, { theme, placement, delayed, hint }: TooltipOptions) {
     const el = this.node();
     if (this.anchor && this.anchor !== anchor) this.unlink(this.anchor);
     const wasOpen = el.classList.contains("is-open");
     this.anchor = anchor;
     el.textContent = text;
+    if (hint) {
+      const tip = document.createElement("span");
+      tip.className = "tooltip__hint";
+      const bulb = document.createElement("span");
+      bulb.className = "tooltip__bulb";
+      bulb.setAttribute("aria-hidden", "true");
+      bulb.textContent = "💡";
+      tip.append(bulb, hint);
+      el.appendChild(tip);
+    }
     const colors = TOOLTIP_THEMES[theme];
     el.style.setProperty("--tooltip-bg", colors.background);
     el.style.setProperty("--tooltip-fg", colors.color);

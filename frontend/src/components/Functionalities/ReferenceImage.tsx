@@ -38,6 +38,7 @@ const ReferenceImage = () => {
       <Tooltip
         placement="bottom"
         content={`${label}: load a picture that shows faintly behind the grid so you can trace over it. It is only a guide: it is not saved with the project or included in downloads.`}
+        hint="Use the eyedropper on the image to pick its colours for your palette."
       >
         <button
           className={`${tool.tool} ${classes.button}`}
